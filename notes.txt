@@ -1,0 +1,2 @@
+export PYTHONPATH="${PYTHONPATH}:/home/pi/movidius/crew-2"
+source ~/.bashrc 
