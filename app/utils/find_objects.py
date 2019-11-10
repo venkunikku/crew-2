@@ -9,6 +9,11 @@ class FindCones:
             "lower_c": [np.array([0, 135, 135]), np.array([15, 255, 255])],
             "upper_c": [np.array([159, 135, 135]), np.array([179, 255, 255])]
 
+        },
+        "yellow" :{
+            "lower_c": [np.array([0, 58, 213]), np.array([75, 194, 255])],
+            "upper_c": [np.array([0, 61, 220]), np.array([75, 194, 255])]
+
         }
     }
 
