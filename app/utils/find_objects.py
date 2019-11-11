@@ -19,7 +19,16 @@ class FindCones:
             "lower_c": [np.array([25, 42, 50]), np.array([95, 255, 255])]
         }
     }
-
+    
+    __bgr_dic = {
+        
+        "red": [0, 0, 255],
+        "green": [0, 255, 0],
+        "blue": [255, 0, 0],
+        "yellow": [0, 225, 238]
+        
+    }
+    
     def __init__(self, color="red"):
         self.color = color
         if color in self.__colors_dic:
@@ -121,13 +130,17 @@ class FindCones:
             # here are only picking triangle that are points upwards. SO if the cone is upside down, our code will not
             # detect that as the cone.
             cones = []
+            cones_obj = dict()
             bounding_rects = []
+            i = 0
             for ch in convex_hulls_3to10:
                 if FindCones.__convex_hull_pointing_up(ch):
                     cones.append(ch)
                     rect = cv2.boundingRect(ch)
                     bounding_rects.append(rect)
-
+                    cones_obj[f"cone-{i}"] = {"cone": ch}
+                    i += 1
+    
             img_cones = np.zeros_like(img_edges)
             cv2.drawContours(img_cones, cones, -1, (255, 255, 255), 2)
             # cv2.drawContours(img_cones, , -1, (1,255,1), 2)
@@ -137,19 +150,27 @@ class FindCones:
             img_res = img.copy()
             cv2.drawContours(img_res, cones, -1, (255, 255, 255), 2)
 
-            for rect in bounding_rects:
+            for idx, rect in enumerate(bounding_rects):
                 cv2.rectangle(img_res, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (1, 255, 1), 3)
+                centX, centY = (rect[0]+rect[0]+rect[2])//2, (rect[1] + rect[1] + rect[3])//2
+                cv2.circle(img_res, (centX, centY), 2, [0,255,0], -1)
+                cone_index = f"cone-{idx}"
+                c_obj = cones_obj[cone_index]
+                c_obj["bouding_box_center"] = (centX, centY)
+                cv2.putText(img_res, f"{self.color}-{cone_index}", (rect[0], rect[1]-4), cv2.FONT_HERSHEY_SIMPLEX, .5, self.__bgr_dic[self.color], 1, cv2.LINE_AA)
 
             # cv2.imshow("img_res", img_res)
 
             # print(f"Total Cones Found:{str(len(bounding_rects))}")
+            
+            
 
             # cv2.waitKey(0)
             # cv2.destroyAllWindows()
             total_cone = len(bounding_rects)
             if total_cone > 0:
-                return True, img_res, total_cone, bounding_rects
-            return False, img_res, 0, None
+                return True, img_res, total_cone, bounding_rects, cones_obj
+            return False, img_res, 0, None, None
 
         except Exception as e:
             raise e

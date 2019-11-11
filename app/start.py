@@ -27,20 +27,32 @@ if record == "True":
 
 
 
-cone_obj = find_objects.FindCones(color="green")
+cone_obj = find_objects.FindCones(color="yellow")
 
 while True:
 	temperature = raspberry_utils.processor_temperature()
-	
+	cv2.putText(frame_back, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0,255, 255), 1, cv2.LINE_AA)
 	
 	res, frame = cap.read()
-	flag, frame_back, total_cones, boxes = cone_obj.find_cone(frame)
-    
+	flag, frame_back, total_cones, boxes, cones_data = cone_obj.find_cone(frame)
+	
 	if total_cones > 0:
 		dt = datetime.datetime.now()
 		cv2.putText(frame_back, f"Total Cones Found: {total_cones}. ({dt})", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, .5, (0,255, 255), 1, cv2.LINE_AA)
 	
-	cv2.putText(frame_back, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0,255, 255), 1, cv2.LINE_AA)
+	
+	
+	he, wi, ch = frame.shape
+	center_of_the_screen = (wi//2, he//2)
+	cv2.circle(frame_back, center_of_the_screen, 5, [255, 0, 0], -1)
+	
+	#b_box_rec = cones_data['cone-0']['bouding_box_center']
+	#print(f"Center of the rectangle-{b_box_rec}")
+	#print(f"Center of the screen-{center_of_the_screen}")
+	
+	
+	
+	
 	cv2.imshow("Cone", frame_back)
 	
 	if record == "True":
