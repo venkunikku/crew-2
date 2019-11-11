@@ -4,6 +4,7 @@
     - You have to set the `PYTHONPATH` so your modules will be recognoized by python interpreter.
      Look into notes.txt files for details.
     -`start.py` will be our start of the script.
+    - Once you set the `PYTHONPATH` on the command linke you can go into `crew-2/app` and then `python3 start.py` to run.
 
 ## Structure of the project
     - `app` will have our major code base for the project.
