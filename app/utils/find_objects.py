@@ -10,13 +10,13 @@ class FindCones:
             "upper_c": [np.array([150, 135, 135]), np.array([180, 255, 255])]
 
         },
-        "yellow" :{
+        "yellow": {
             "lower_c": [np.array([20, 112, 171]), np.array([94, 255, 255])]
-            #"upper_c": [np.array([0, 61, 220]), np.array([75, 194, 255])]
+            # "upper_c": [np.array([0, 61, 220]), np.array([75, 194, 255])]
 
         },
-        "green":{
-        "lower_c": [np.array([25, 42, 50]), np.array([95, 255, 255])]
+        "green": {
+            "lower_c": [np.array([25, 42, 50]), np.array([95, 255, 255])]
         }
     }
 
@@ -44,8 +44,6 @@ class FindCones:
             # converting color image to HSV. HSV helps to filter colors much better than RGB.
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-            
-            
             if self.color == "red":
                 # filtering color based on the object it was initialized.
                 imgLowThreshold = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
@@ -56,7 +54,6 @@ class FindCones:
                 imgThresh = cv2.bitwise_or(imgLowThreshold, imgHighThreshold)
             else:
                 imgThresh = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
-            
 
             # cv2.imshow("imgThresh", imgThresh)
 
