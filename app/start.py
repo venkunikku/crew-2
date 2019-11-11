@@ -27,7 +27,7 @@ if record == "True":
 
 
 
-cone_obj = find_objects.FindCones()
+cone_obj = find_objects.FindCones(color="green")
 
 while True:
 	temperature = raspberry_utils.processor_temperature()

@@ -6,21 +6,28 @@ class FindCones:
     __colors_dic = {
 
         "red": {
-            "lower_c": [np.array([0, 135, 135]), np.array([15, 255, 255])],
-            "upper_c": [np.array([159, 135, 135]), np.array([179, 255, 255])]
+            "lower_c": [np.array([0, 135, 135]), np.array([30, 255, 255])],
+            "upper_c": [np.array([150, 135, 135]), np.array([180, 255, 255])]
 
         },
         "yellow" :{
-            "lower_c": [np.array([0, 58, 213]), np.array([75, 194, 255])],
-            "upper_c": [np.array([0, 61, 220]), np.array([75, 194, 255])]
+            "lower_c": [np.array([20, 112, 171]), np.array([94, 255, 255])]
+            #"upper_c": [np.array([0, 61, 220]), np.array([75, 194, 255])]
 
+        },
+        "green":{
+        "lower_c": [np.array([25, 42, 50]), np.array([95, 255, 255])]
         }
     }
 
     def __init__(self, color="red"):
+        self.color = color
         if color in self.__colors_dic:
-            self.lowerc_array = self.__colors_dic[color]["lower_c"]
-            self.upperc_array = self.__colors_dic[color]["upper_c"]
+            if self.color == "red":
+                self.lowerc_array = self.__colors_dic[color]["lower_c"]
+                self.upperc_array = self.__colors_dic[color]["upper_c"]
+            else:
+                self.lowerc_array = self.__colors_dic[color]["lower_c"]
 
         else:
             raise Exception("Color is not in the dictionary")
@@ -37,14 +44,19 @@ class FindCones:
             # converting color image to HSV. HSV helps to filter colors much better than RGB.
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-            # filtering color based on the object it was initialized.
-            imgLowThreshold = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
-            imgHighThreshold = cv2.inRange(hsv, self.upperc_array[0], self.upperc_array[1])
+            
+            
+            if self.color == "red":
+                # filtering color based on the object it was initialized.
+                imgLowThreshold = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
+                imgHighThreshold = cv2.inRange(hsv, self.upperc_array[0], self.upperc_array[1])
+                # cv2.imshow("Orginal", img)
 
-            # cv2.imshow("Orginal", img)
-
-            # combining low and high threshold image to get only the color eg red in the picture.
-            imgThresh = cv2.bitwise_or(imgLowThreshold, imgHighThreshold)
+                # combining low and high threshold image to get only the color eg red in the picture.
+                imgThresh = cv2.bitwise_or(imgLowThreshold, imgHighThreshold)
+            else:
+                imgThresh = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
+            
 
             # cv2.imshow("imgThresh", imgThresh)
 
