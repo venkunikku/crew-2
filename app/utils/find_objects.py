@@ -6,17 +6,16 @@ class FindCones:
     __colors_dic = {
 
         "red": {
-            "lower_c": [np.array([0, 135, 135]), np.array([30, 255, 255])],
+            "lower_c": [np.array([0, 135, 135]), np.array([15, 255, 255])],
             "upper_c": [np.array([150, 135, 135]), np.array([180, 255, 255])]
 
         },
         "yellow": {
-            "lower_c": [np.array([20, 112, 171]), np.array([94, 255, 255])]
-            # "upper_c": [np.array([0, 61, 220]), np.array([75, 194, 255])]
+            "lower_c": [np.array([15, 112, 221]), np.array([45, 255, 255])]
 
         },
         "green": {
-            "lower_c": [np.array([25, 42, 50]), np.array([95, 255, 255])]
+            "lower_c": [np.array([25, 42, 50]), np.array([95, 255, 255])] #45/75
         }
     }
     
@@ -31,6 +30,7 @@ class FindCones:
     
     def __init__(self, color="red"):
         self.color = color
+        print(f"Finding Follwoing color:{self.color} and color: {self.__colors_dic[color]}")
         if color in self.__colors_dic:
             if self.color == "red":
                 self.lowerc_array = self.__colors_dic[color]["lower_c"]
