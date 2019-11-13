@@ -1,2 +1,2 @@
-export PYTHONPATH="${PYTHONPATH}:/home/pi/movidius/crew-2"
+export PYTHONPATH="${PYTHONPATH}:/home/pi/movidius/crew-2" #Note that insted of the I provided it would be the path where you have cloned the repo. So change this line "/home/pi/movidius/crew-2" based on your folder structure.
 source ~/.bashrc 
