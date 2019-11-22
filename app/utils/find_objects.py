@@ -158,6 +158,7 @@ class FindCones:
                 c_obj = cones_obj[cone_index]
                 c_obj["bouding_box_center"] = (centX, centY)
                 cv2.putText(img_res, f"{self.color}-{cone_index}", (rect[0], rect[1]-4), cv2.FONT_HERSHEY_SIMPLEX, .5, self.__bgr_dic[self.color], 1, cv2.LINE_AA)
+                cv2.putText(img_res, f"coord: {c_obj['bouding_box_center']}", (centX, centY), cv2.FONT_HERSHEY_SIMPLEX, .5, (0,255, 255), 1, cv2.LINE_AA)
 
             # cv2.imshow("img_res", img_res)
 
