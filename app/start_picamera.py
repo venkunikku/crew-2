@@ -46,7 +46,7 @@ def move_around_to_find_cone(cone_obj, raw_capture, obj, degress_area_to_scan=50
         raise Exception(
             f"degress_to_move:{degress_to_move} should be lesser than degress_area_to_scan:{degress_area_to_scan}")
 
-    turn_deg_liste = [0, 15, -30, 45, -90]
+    turn_deg_liste = [0, 20, -40, 60, -80, 100, -120]
 
     for d in turn_deg_liste:
         easy.turn_degrees(d)
@@ -141,7 +141,7 @@ def euclidean_distance(pt1, pt2):
     return math.sqrt(p1 + p2)
 
 
-def gogo(camera, raw_capture, cone_color="yellow"):
+def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
     # global is_cone_centered, forwarded, iscircle_done, temperature, frame_back, cones_data, center_of_the_screen, upper_left, upper_right, lower_left, lower_right, cone_boudning_box, height_range, rect_bottom_mind_point, cone_bottom_mid_points_y, hieght_range_forward, found_required_cone, i, b_box_rec, angle, ref, distance_to_center
     ap = argparse.ArgumentParser()
     ap.add_argument("-r", "--record", required=False, help="Path to the image")
@@ -168,6 +168,7 @@ def gogo(camera, raw_capture, cone_color="yellow"):
 
         if not found_required_cone:
             # finding Cone
+            print("Finding cone")
             found_required_cone = move_around_to_find_cone(cone_obj, raw_capture, frame_obj)
             raw_capture.truncate(0)
             continue
@@ -249,16 +250,18 @@ def gogo(camera, raw_capture, cone_color="yellow"):
                     # easy.reset_all()
                     # easy.turn_degrees(30)
                     easy.turn_degrees(-90)
-                    easy.orbit(360, 75)
+                    easy.orbit(360, 60)
                     easy.turn_degrees(90)
-                    easy.turn_degrees(180)
+                    easy.turn_degrees(220)
                     iscircle_done = True
 
-                if iscircle_done:
-                    go_home(raw_capture, frame_obj, cone_color="red")
-                    raw_capture.truncate(0)
-                    camera.close()
-                    break
+
+        if iscircle_done:
+			#print(f"Home Cone color: {home_cone_color}")
+			#print(f"Home Cone color: {home_cone_color}"
+            go_home(raw_capture, frame_obj, cone_color=home_cone_color)
+            raw_capture.truncate(0)
+            break
 
         cv2.imshow("PI", frame_back)
         key = cv2.waitKey(1) & 0xFF
@@ -269,11 +272,13 @@ def gogo(camera, raw_capture, cone_color="yellow"):
             break
 
 
-def go_home(raw_capture, frame_obj, cone_color="orange"):
-    cone_obj = find_objects.FindCones(cone_color=cone_color)
+def go_home(raw_capture, frame_obj, cone_color="red"):
+    print(f"Home cone color: {cone_color}")
+    cone_obj = find_objects.FindCones(color=cone_color)
     raw_capture.truncate(0)
     found_required_cone = False
     is_cone_centered = False
+    forwarded= False
     for frm in frame_obj:
         frame = frm.array
 
@@ -320,10 +325,17 @@ def go_home(raw_capture, frame_obj, cone_color="orange"):
                         # Center the cone while you drive forward
                         center_cone_to_screen_and_gopio(cone_boudning_box, center_boundary_left_right_width)
                 if forwarded:
-                    easy.drive_inches(5)
-                    easy.turn_degrees(360)
+                    easy.drive_inches(15)
+                    easy.turn_degrees(210)
+                    break
+		
+        cv2.imshow("PI", frame_back)
+        key = cv2.waitKey(1) & 0xFF
 
         raw_capture.truncate(0)
+
+        if key == ord("q"):
+            break
 
 
 def screen_coordinates(frame_back):
@@ -343,7 +355,7 @@ def screen_coordinates(frame_back):
 def get_close_to_the_cone(cone_bottom_mid_points_y, height_range_forward):
     if not height_range_forward[0] <= cone_bottom_mid_points_y <= height_range_forward[1]:
         # print(f"Foward Range: {hieght_range_forward}, Cone Center: {cone_bottom_mid_points_y}")
-        drive_forward_towards_cone(cone_bottom_mid_points_y, height_range_forward, )
+        drive_forward_towards_cone(cone_bottom_mid_points_y, height_range_forward, drive_inches=1)
         return False
     else:
         return True
@@ -366,5 +378,6 @@ if __name__ == '__main__':
     raw_capture = PiRGBArray(camera, size=(640, 480))
     time.sleep(1)
     print("String the journey")
-    gogo(camera, raw_capture)
+    for c in ["yellow","red"]:
+        gogo(camera, raw_capture,cone_color=c, home_cone_color="red")
     print("End")
