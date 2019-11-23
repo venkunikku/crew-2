@@ -151,8 +151,8 @@ def move_to_center_of_screen(cone_color="red", cap=None, height_range=(280, 360)
 	if cone_boudning_box[0] > height_range[1]:
 		# move right
 		print(F"Moving right")
-		easy.steer(2, 0)
-		time.sleep(2)
+		easy.steer(1, 0)
+		time.sleep(1)
 		easy.stop()
 
 
@@ -161,7 +161,7 @@ def move_to_center_of_screen(cone_color="red", cap=None, height_range=(280, 360)
 		# move left
 		print(F"Moving left")
 		easy.steer(0, 1)
-		time.sleep(2)
+		time.sleep(1)
 		easy.stop()
 			
 			
@@ -265,9 +265,12 @@ cone_color = "yellow"
 cone_obj = find_objects.FindCones(color=cone_color)
 aline_cone_to_the_center = False
 
-found_required_cone = True
-is_cone_centered = True
-forwarded = True 
+found_required_cone = False
+is_cone_centered = False
+forwarded = False 
+iscircle_done = False
+
+
 frame_obj = camera.capture_continuous(raw_capture, format="bgr", use_video_port=True)
 for frm in frame_obj:
 	temperature = raspberry_utils.processor_temperature()
@@ -361,6 +364,15 @@ for frm in frame_obj:
 					else:
 						forwarded= True
 						is_cone_centered = False
+			print(f"Flags so far forwarded:{forwarded} and the circle:{iscircle_done} and is cone centerd:{is_cone_centered}")			
+			if forwarded and not iscircle_done:
+				#easy.reset_all()
+				#easy.turn_degrees(30)
+				easy.turn_degrees(-90)
+				easy.orbit(360, 75)
+				easy.turn_degrees(90)
+				easy.turn_degrees(180)
+				iscircle_done = True
 					
 				
 				
