@@ -87,7 +87,7 @@ def move_to_center_of_screen(height_range=(280, 360), cone_boudning_box=None):
         easy.stop()
 
 
-def move_close_to_the_cone(cone_bottom_mid_points_y, boundary_range=None, drive_inches=0.5):
+def drive_forward_towards_cone(cone_bottom_mid_points_y, boundary_range=None, drive_inches=0.5):
     if boundary_range:
         if boundary_range[0] > cone_bottom_mid_points_y:
             easy.drive_inches(drive_inches)
@@ -221,11 +221,11 @@ def gogo():
                 cone_boudning_box = cones_data['cone-0']['bouding_box_center']
 
                 if not is_cone_centered:
-                    height_range = (left_top[0], rigth_top[0])
+                    center_boundary_left_right_width = (left_top[0], rigth_top[0])
                     print(
-                        f"Cone no centered moving for height rnage:{height_range} and cone bouding box:{cone_boudning_box}")
+                        f"Cone no centered moving for height rnage:{center_boundary_left_right_width} and cone bouding box:{cone_boudning_box}")
 
-                    is_cone_centered = center_cone_to_screen_and_gopio(cone_boudning_box, height_range)
+                    is_cone_centered = center_cone_to_screen_and_gopio(cone_boudning_box, center_boundary_left_right_width)
                 x, y, w, h = boxes[0]
                 x1, y1, x4, y4 = (x, y, x + w, y + h)
                 tl = (x1, y1)
@@ -242,15 +242,13 @@ def gogo():
                             .5, (0, 255, 255), 1, cv2.LINE_AA)
 
                 if is_cone_centered:
-                    cone_bottom_mid_points_y = rect_bottom_mind_point[1]
-                    hieght_range_forward = (upper_left[1] + 20, lower_left[1] + 20)
+                    cone_lower_rec_boundary_mid_point_height = rect_bottom_mind_point[1]
+                    bottom_boundary_upper_lower_height = (upper_left[1] + 20, lower_left[1] + 20)
                     if not forwarded:
-                        if not hieght_range_forward[0] <= cone_bottom_mid_points_y <= hieght_range_forward[1]:
-                            print(f"Foward Range: {hieght_range_forward}, Cone Center: {cone_bottom_mid_points_y}")
-                            move_close_to_the_cone(cone_bottom_mid_points_y, hieght_range_forward, )
-                        else:
-                            forwarded = True
-                            is_cone_centered = False
+                        forwarded = get_close_to_the_cone(cone_lower_rec_boundary_mid_point_height,
+                                                          bottom_boundary_upper_lower_height)
+                        # Center the cone while you drive forward
+                        center_cone_to_screen_and_gopio(cone_boudning_box, center_boundary_left_right_width)
                 print(
                     f"Flags so far forwarded:{forwarded} and the circle:{iscircle_done} and is cone centerd:{is_cone_centered}")
                 if forwarded and not iscircle_done:
@@ -269,6 +267,15 @@ def gogo():
 
         if key == ord("q"):
             break
+
+
+def get_close_to_the_cone(cone_bottom_mid_points_y, height_range_forward):
+    if not height_range_forward[0] <= cone_bottom_mid_points_y <= height_range_forward[1]:
+        # print(f"Foward Range: {hieght_range_forward}, Cone Center: {cone_bottom_mid_points_y}")
+        drive_forward_towards_cone(cone_bottom_mid_points_y, height_range_forward, )
+        return False
+    else:
+        return True
 
 
 def center_cone_to_screen_and_gopio(cone_boudning_box, height_range):
