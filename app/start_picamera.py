@@ -365,4 +365,6 @@ if __name__ == '__main__':
     # camera.vflip = True
     raw_capture = PiRGBArray(camera, size=(640, 480))
     time.sleep(1)
+    print("String the journey")
     gogo(camera, raw_capture)
+    print("End")
