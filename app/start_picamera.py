@@ -8,10 +8,18 @@ import math
 import time
 from picamera.array import PiRGBArray
 from picamera import PiCamera
+import argparse
+from fanshim import FanShim
+
+
+fanshim = FanShim()
+fanshim.set_fan(True)
+
+utils = raspberry_utils.Utils()
 
 cap = None
 easy = EasyGoPiGo3()
-
+easy.set_left_eye_color((10,20,30))
 
 # def center_cone():
 # 	b_box_rec = cones_data['cone-0']['bouding_box_center']
@@ -38,6 +46,15 @@ easy = EasyGoPiGo3()
 # 		#time.sleep(10)
 # 		#break
 
+cone_color = {
+        
+        "red": (255, 0,0),
+        "green": (0, 255, 0),
+        "blue": (0, 0, 255),
+        "yellow": (238, 225, 0)
+        
+    }
+
 def move_around_to_find_cone(cone_obj, raw_capture, obj, degress_area_to_scan=50, degress_to_move=15,
                              loops_to_check=100):
     raw_capture.truncate(0)
@@ -46,26 +63,31 @@ def move_around_to_find_cone(cone_obj, raw_capture, obj, degress_area_to_scan=50
         raise Exception(
             f"degress_to_move:{degress_to_move} should be lesser than degress_area_to_scan:{degress_area_to_scan}")
 
-    turn_deg_liste = [0, 20, -40, 60, -80, 100, -120]
+    turn_deg_liste = [0, 20, -40, 60, -80, 100, -120, 140, -160]
 
     for d in turn_deg_liste:
         easy.turn_degrees(d)
         time.sleep(1)
         i = 0
         print(f"Chekcing for Degress:{d}")
-
+        easy.set_right_eye_color(cone_color[cone_obj.color])
+        easy.set_left_eye_color(cone_color[cone_obj.color])
         for fram in obj:
+            easy.open_eyes()
             i += 1
             frame = fram.array
             flag, frame_back, total_cones, boxes, cones_data = cone_obj.find_cone(frame)
             if total_cones > 0:
                 print("Found cone on left side")
                 # return flag, frame_back, total_cones, boxes, cones_data
+                easy.close_eyes()
                 return True
             if i == loops_to_check:
                 raw_capture.truncate(0)
+                easy.close_eyes()
                 break
             raw_capture.truncate(0)
+            easy.close_eyes()
 
     return False
 
@@ -74,15 +96,21 @@ def move_to_center_of_screen(height_range=(280, 360), cone_boudning_box=None):
     if cone_boudning_box[0] > height_range[1]:
         # move right
         print(F"Moving right")
+        easy.open_left_eye()
         easy.steer(1, 0)
         time.sleep(1)
         easy.stop()
+        easy.close_left_eye()
+        
 
     if cone_boudning_box[0] < height_range[1]:
         # move left
         print(F"Moving left")
+        easy.open_right_eye()
+        
         easy.steer(0, 1)
         time.sleep(1)
+        easy.close_right_eye()
         easy.stop()
 
 
@@ -142,11 +170,10 @@ def euclidean_distance(pt1, pt2):
 
 
 def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
+    fanshim.set_light(255,0,0)
+    args = processe_args()
     # global is_cone_centered, forwarded, iscircle_done, temperature, frame_back, cones_data, center_of_the_screen, upper_left, upper_right, lower_left, lower_right, cone_boudning_box, height_range, rect_bottom_mind_point, cone_bottom_mid_points_y, hieght_range_forward, found_required_cone, i, b_box_rec, angle, ref, distance_to_center
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-r", "--record", required=False, help="Path to the image")
-    ap.add_argument("-flp", "--flip_imgae", required=False, help="Path to the image")
-    args = vars(ap.parse_args())
+    print(f"All args: {args}")    
     # cap = cv2.VideoCapture(0)
     record = args["record"]
     isflip = args["flip_imgae"]
@@ -160,9 +187,10 @@ def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
     iscircle_done = False
     frame_obj = camera.capture_continuous(raw_capture, format="bgr", use_video_port=True)
     for frm in frame_obj:
-        temperature = raspberry_utils.processor_temperature()
+        temperature = utils.get_temperature() #raspberry_utils.processor_temperature()
         frame = frm.array
         # print(image.shape, type(image), image)
+        cv2.putText(frame, f"Temp:{temperature}, {utils.get_gopigo_details()}", (50, 30), cv2.FONT_HERSHEY_TRIPLEX, .5, (255,51, 85), 2, cv2.LINE_AA)
 
         flag, frame_back, total_cones, boxes, cones_data = cone_obj.find_cone(frame)
 
@@ -250,7 +278,10 @@ def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
                     # easy.reset_all()
                     # easy.turn_degrees(30)
                     easy.turn_degrees(-90)
-                    easy.orbit(360, 60)
+                    if args["is_carpet"] == "True":
+                        easy.orbit(480, 60)
+                    else:
+                        easy.orbit(360, 60)
                     easy.turn_degrees(90)
                     easy.turn_degrees(220)
                     iscircle_done = True
@@ -270,7 +301,7 @@ def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
 
         if key == ord("q"):
             break
-
+    #fanshim.set_light(0,0,0)
 
 def go_home(raw_capture, frame_obj, cone_color="red"):
     print(f"Home cone color: {cone_color}")
@@ -336,7 +367,8 @@ def go_home(raw_capture, frame_obj, cone_color="red"):
 
         if key == ord("q"):
             break
-
+    fanshim.set_light(0,0,0)
+    #fanshim.set_fan(False)
 
 def screen_coordinates(frame_back):
     height, width, ch = frame_back.shape
@@ -370,14 +402,25 @@ def center_cone_to_screen_and_gopio(cone_boudning_box, height_range):
     else:
         return True
 
+def processe_args():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-carpet", "--is_carpet", required=False, help="Is the Surface carpet")
+    ap.add_argument("-r", "--record", required=False, help="Path to the image")
+    ap.add_argument("-flp", "--flip_imgae", required=False, help="Path to the image")
+    args = vars(ap.parse_args())
+    print(f"All args: {args}")
+    return args
+
 
 if __name__ == '__main__':
+    args = processe_args()
     camera = PiCamera()
     camera.resolution = (640, 480)
-    # camera.vflip = True
+    #camera.vflip = True
     raw_capture = PiRGBArray(camera, size=(640, 480))
     time.sleep(1)
     print("String the journey")
-    for c in ["yellow","red"]:
+    for c in ["yellow"]:#,"red"
         gogo(camera, raw_capture,cone_color=c, home_cone_color="red")
     print("End")
+    fanshim.set_fan(False)
