@@ -51,7 +51,8 @@ cone_color = {
         "red": (255, 0,0),
         "green": (0, 255, 0),
         "blue": (0, 0, 255),
-        "yellow": (238, 225, 0)
+        "yellow": (238, 225, 0),
+        "purple":(238, 225, 0)
         
     }
 
@@ -279,7 +280,7 @@ def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
                     # easy.turn_degrees(30)
                     easy.turn_degrees(-90)
                     if args["is_carpet"] == "True":
-                        easy.orbit(480, 60)
+                        easy.orbit(460, 60)
                     else:
                         easy.orbit(360, 60)
                     easy.turn_degrees(90)
@@ -421,6 +422,6 @@ if __name__ == '__main__':
     time.sleep(1)
     print("String the journey")
     for c in ["yellow"]:#,"red"
-        gogo(camera, raw_capture,cone_color=c, home_cone_color="red")
+        gogo(camera, raw_capture,cone_color=c, home_cone_color="green")
     print("End")
     fanshim.set_fan(False)
