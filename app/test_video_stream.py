@@ -9,13 +9,14 @@ cam = None
 
 def clean_up():
 	global cam
-	print("Cleaning up", cam)
+	print("Cleaning up using the hook", cam)
 	cam.stop()
 
-atexit.register(clean_up)
+
 if __name__ == '__main__':
 	cam = VideoStreamMulProcess.StreamMultiProcssing().start()
 	#cam = VideoStream.StreamThreaded().start()
+	atexit.register(clean_up)
 	time.sleep(2.0)
 	try:     
 		#cam.start()
@@ -35,9 +36,10 @@ if __name__ == '__main__':
 			  
 			k = cv2.waitKey(1) & 0xFF
 			if k ==27:
+				print("Clicked on escape")
 				break 
 			#print(".", end=" ")
-			
+		cv2.destroyAllWindows()	
 		cam.stop()
 	except (KeyboardInterrupt, Exception) as e:
 		print("Error", e)
