@@ -1,23 +1,51 @@
-from app.utils import VideoStream
+from app.utils import VideoStream, VideoStreamMulProcess
 import cv2
 import time
+import traceback
+import atexit
 
+process = True
+cam = None
+
+def clean_up():
+	global cam
+	print("Cleaning up", cam)
+	cam.stop()
+
+atexit.register(clean_up)
 if __name__ == '__main__':
-	cam = VideoStream.StreamMultiProcssing().start()
-	time.sleep(5.0)
+	cam = VideoStreamMulProcess.StreamMultiProcssing().start()
+	#cam = VideoStream.StreamThreaded().start()
+	time.sleep(2.0)
 	try:     
 		#cam.start()
 		#print(cam.read())
 		while True:
 			frame = cam.read()
-			#print(f"Frame: {frame}")
-			if frame:
+			#print(f"Frame: {type(frame)}")
+			
+# 			while frame.empty is False:
+#                             print(frame.get())
+			
+			if process:
+				while frame.empty() is False:
+					cv2.imshow("inter", frame.get())
+			else:
 				cv2.imshow("inter", frame)
+			  
 			k = cv2.waitKey(1) & 0xFF
 			if k ==27:
-				break
+				break 
+			#print(".", end=" ")
 			
 		cam.stop()
-	except Exception as e:
+	except (KeyboardInterrupt, Exception) as e:
 		print("Error", e)
 		cam.stop()
+		print(traceback.print_exc())
+	finally:
+		cam.stop()
+		
+	
+
+

@@ -1,7 +1,7 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 from threading import Thread
-from multiprocessing import Process
+import multiprocessing
 
 
 class StreamThreaded:
@@ -45,13 +45,15 @@ class StreamMultiProcssing:
         self.camera.resolution = resolution
         self.camera.framerate = framerate
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
-        self.stream = self.camera.capture_continuous(self.rawCapture, format='bgr', use_video_port=False)
+        self.stream = self.camera.capture_continuous(self.rawCapture, format='bgr', use_video_port=True)
         self.frame = None
         self.stopped = False
 
     def start(self):
         print("Starting thread")
-        Process(target=self.update, args=()).start()
+        p1 = multiprocessing.Process(target=self.update, args=(), name="Video")
+        p1.start()
+        print("Process p1:", p1)
         return self
 
     def update(self):
