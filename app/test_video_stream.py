@@ -14,8 +14,9 @@ def clean_up():
 
 
 if __name__ == '__main__':
-	cam = VideoStreamMulProcess.StreamMultiProcssing().start()
+	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()
 	#cam = VideoStream.StreamThreaded().start()
+	cam = VideoStreamMulProcess.MultiProcessInitiate().start()
 	atexit.register(clean_up)
 	time.sleep(2.0)
 	try:     
