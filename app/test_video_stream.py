@@ -3,6 +3,7 @@ import cv2
 import time
 import traceback
 import atexit
+import os
 
 process = True
 cam = None
@@ -16,14 +17,16 @@ def clean_up():
 if __name__ == '__main__':
 	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()
 	#cam = VideoStream.StreamThreaded().start()
-	cam = VideoStreamMulProcess.MultiProcessInitiate().start()
+	#cam = VideoStreamMulProcess.MultiProcessInitiate().start()
+	cam = VideoStreamMulProcess.run_process()
 	atexit.register(clean_up)
 	time.sleep(2.0)
 	try:     
 		#cam.start()
 		#print(cam.read())
 		while True:
-			frame = cam.read()
+			frame = cam[0]#.read()
+			#print("Main", os.getpid())
 			#print(f"Frame: {type(frame)}")
 			
 # 			while frame.empty is False:
@@ -41,7 +44,9 @@ if __name__ == '__main__':
 				break 
 			#print(".", end=" ")
 		cv2.destroyAllWindows()	
-		cam.stop()
+		#cam.stop()
+		cam[1].join()
+		cam[1].terminate()
 	except (KeyboardInterrupt, Exception) as e:
 		print("Error", e)
 		cam.stop()
