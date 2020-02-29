@@ -1,4 +1,4 @@
-from app.utils import VideoStream, VideoStreamMulProcess
+from app.utils import video_stream, VideoStreamMulProcess
 import cv2
 import time
 import traceback
