@@ -5,8 +5,8 @@ from random import seed
 from random import randint 
 
 
-noise_downsampled_dir = '../noise_downsampled/'
-## I used just one folder above
+noise_downsampled_dir = '../../noise_downsampled/'
+
 noise_chunks = []
 
 for i in os.listdir(noise_downsampled_dir):
@@ -15,9 +15,9 @@ for i in os.listdir(noise_downsampled_dir):
 
 seed(31)
 
-down_sampled_training_dir = '../downsampled/'
-noise_downsampled_dir = '../noise_downsampled/'
-target_dir = '../training_downsampled/'
+down_sampled_training_dir = '../../training_downsampled/'
+noise_downsampled_dir = '../../noise_downsampled/'
+target_dir = '../../mixed/'
 
 
 for filename in os.listdir(down_sampled_training_dir):
@@ -38,8 +38,8 @@ for filename in os.listdir(down_sampled_training_dir):
     combined.export(target_dir + "mixed_" + base_name, format="wav")
 
 
-## Gneratin new metadata
-mixed_meta_data = pd.read_csv('../training/UrbanSound8K/metadata/metadata.csv')
+### Generating new metadata ###
+mixed_meta_data = pd.read_csv('../../training/UrbanSound8K/metadata/metadata.csv')
 name_list = mixed_meta_data['slice_file_name']
 temp = ['mixed_' + s for s in name_list]
 mixed_meta_data['slice_file_name'] = temp

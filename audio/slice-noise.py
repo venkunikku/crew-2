@@ -5,7 +5,7 @@ noise_downsampled_dir = "../../noise_downsampled/"
 
 audio_file = noise_downsampled_dir + "combined-noise.wav"
 audio = AudioSegment.from_wav(audio_file)
-list_of_timestamps = list(np.arange(5,120,5))  #and so on in *seconds*
+list_of_timestamps = list(np.arange(4,120,4))  #and so on in *seconds*
 
 start = 0
 for  idx,t in enumerate(list_of_timestamps):

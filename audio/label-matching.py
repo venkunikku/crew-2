@@ -3,11 +3,11 @@ import pandas as pd
 import librosa 
 
 
-meta_data = pd.read_csv('../training/UrbanSound8K/metadata/metadata.csv')
+meta_data = pd.read_csv('../../training/UrbanSound8K/metadata/metadata.csv')
 x = []
 sr = []
 audio_class = []
-folder_name = '../downsampled/'
+folder_name = '../../mixed/'
 
 for filename in os.listdir(folder_name):
 
