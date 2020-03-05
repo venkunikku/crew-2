@@ -9,30 +9,28 @@ import logging
 process = True
 cam = None
 
+
 def clean_up():
-	global cam
-	print("Cleaning up using the hook", cam)
-	cam.stop()
+    global cam
+    print("Cleaning up using the hook", cam)
+    cam.stop()
 
 
 if __name__ == '__main__':
-	logger = logging.getLogger('main')
-	logger.setLevel(logging.DEBUG)
+    logger = logging.getLogger('main')
+    logger.setLevel(logging.DEBUG)
 
-	ch = logging.StreamHandler()
-	ch.setLevel(logging.ERROR)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
 
-	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-	ch.setFormatter(formatter)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
 
-	logger.addHandler(ch)
+    logger.addHandler(ch)
 
-	logger.info("Creating the the object for Robot class")
-	test = robot_rajanikanth.NavigateRajani()
-
-	print(test.find_cone(cone_color="red"))
-
-
+    logger.info("Creating the the object for Robot class")
+    with robot_rajanikanth.NavigateRajani(show_video_feed=True) as test:
+        print(test.find_cone(cone_color="red"))
 
 # 	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()
 # 	#cam = VideoStream.StreamThreaded().start()
@@ -72,7 +70,3 @@ if __name__ == '__main__':
 # 		print(traceback.print_exc())
 # 	finally:
 # 		cam.stop()
-		
-	
-
-

@@ -35,7 +35,7 @@ class NavigateRajani:
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160]
         if cone_color:
             for turn_to_degree in turn_deg_list:
-                self.log.inf(f"Moving to the following degree {turn_to_degree}")
+                self.log.info(f"Moving to the following degree {turn_to_degree}")
                 self.gopi_easy.turn_degrees(turn_to_degree)
                 time.sleep(1)
                 for frame in self.camera.read():
@@ -71,8 +71,8 @@ class NavigateRajani:
                         horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                         (0, 255, 255), 1, cv2.LINE_AA)
 
-            cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
-                        cv2.LINE_AA)
+            # cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
+            #             cv2.LINE_AA)
 
             cv2.imshow("Video Feed", frame)
 
@@ -108,7 +108,10 @@ class NavigateRajani:
         return frame
 
     def __enter__(self):
+        self.log.info("Context open")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.log.info("Destroying all the resources")
         self.camera.stop()
+        cv2.destroyAllWindows()
