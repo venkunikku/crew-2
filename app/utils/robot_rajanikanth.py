@@ -38,8 +38,8 @@ class NavigateRajani:
                 self.log.info(f"Moving to the following degree {turn_to_degree}")
                 self.gopi_easy.turn_degrees(turn_to_degree)
                 time.sleep(1)
-                for frame in self.camera.read():
-                    print(frame)
+                while True:
+                    frame = self.camera.read()
                     find_cone_obj = FindCones(color=cone_color)
                     flag, frame_back, total_cones, boxes, cones_data = find_cone_obj.find_cone(frame)
                     if total_cones > 0:
