@@ -9,7 +9,7 @@ import logging
 process = True
 cam = None
 logger = logging.getLogger('main')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
 ch.setLevel(logging.ERROR)
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
 
     logger.info("Creating the the object for Robot class")
-    with robot_rajanikanth.NavigateRajani(show_video_feed=True) as test:
+    with robot_rajanikanth.NavigateRajani(show_video=False) as test:
         print(test.find_cone(cone_color="red"))
 
 # 	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()

@@ -145,7 +145,7 @@ class FindCones:
             cv2.drawContours(img_cones, cones, -1, (255, 255, 255), 2)
             # cv2.drawContours(img_cones, , -1, (1,255,1), 2)
 
-            cv2.imshow("img_cones", img_cones)
+            #cv2.imshow("img_cones", img_cones)
 
             img_res = img.copy()
             cv2.drawContours(img_res, cones, -1, (255, 255, 255), 2)
