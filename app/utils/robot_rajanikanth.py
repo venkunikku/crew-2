@@ -38,9 +38,10 @@ class NavigateRajani:
                 self.log.info(f"Moving to the following degree {turn_to_degree}")
                 self.gopi_easy.turn_degrees(turn_to_degree)
                 time.sleep(1)
+                find_cone_obj = FindCones(color=cone_color)
+                
                 while True:
                     frame = self.camera.read()
-                    find_cone_obj = FindCones(color=cone_color)
                     flag, frame_back, total_cones, boxes, cones_data = find_cone_obj.find_cone(frame)
                     if total_cones > 0:
                         return self
@@ -49,7 +50,8 @@ class NavigateRajani:
             raise ConeColorMissing("Cone color is required here and is missing")
 
     def show_video_feed(self):
-        for frame in self.camera.read():
+        while True:
+            frame = self.camera.read()
             frame = NavigateRajani.center_boundaries(frame)
             center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
             left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates()
