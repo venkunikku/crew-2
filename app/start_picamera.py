@@ -190,6 +190,7 @@ def gogo(camera, raw_capture, cone_color="yellow", home_cone_color="orange"):
         temperature = utils.get_temperature() #raspberry_utils.processor_temperature()
         frame = frm.array
         # print(image.shape, type(image), image)
+        print("my frame", frame)
         cv2.putText(frame, f"Temp:{temperature}, {utils.get_gopigo_details()}", (50, 30), cv2.FONT_HERSHEY_TRIPLEX, .5, (255,51, 85), 2, cv2.LINE_AA)
 
         flag, frame_back, total_cones, boxes, cones_data = cone_obj.find_cone(frame)

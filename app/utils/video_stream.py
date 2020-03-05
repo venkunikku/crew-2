@@ -2,6 +2,7 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 from threading import Thread
 import multiprocessing
+import time
 
 
 class StreamThreaded:
@@ -13,6 +14,7 @@ class StreamThreaded:
         self.stream = self.camera.capture_continuous(self.rawCapture, format='bgr', use_video_port=True)
         self.frame = None
         self.stopped = False
+        time.sleep(2)
 
     def start(self):
         print("Starting thread")

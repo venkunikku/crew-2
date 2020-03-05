@@ -1,4 +1,4 @@
-from app.utils import video_stream, VideoStreamMulProcess, robot_rajanikanth
+from app.utils import  robot_rajanikanth #video_stream, VideoStreamMulProcess,
 import cv2
 import time
 import traceback
@@ -8,7 +8,15 @@ import logging
 
 process = True
 cam = None
+logger = logging.getLogger('main')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
 
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 def clean_up():
     global cam
@@ -17,16 +25,7 @@ def clean_up():
 
 
 if __name__ == '__main__':
-    logger = logging.getLogger('main')
-    logger.setLevel(logging.DEBUG)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.ERROR)
-
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-
-    logger.addHandler(ch)
+    
 
     logger.info("Creating the the object for Robot class")
     with robot_rajanikanth.NavigateRajani(show_video_feed=True) as test:

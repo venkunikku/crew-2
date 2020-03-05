@@ -1,8 +1,8 @@
-from video_stream import StreamThreaded
-from robot_custome_exception import ConeColorMissing
+from app.utils.video_stream import StreamThreaded
+from app.utils.robot_custome_exception import ConeColorMissing
 import cv2
 from threading import Thread
-from find_objects import FindCones
+from app.utils.find_objects import FindCones
 import numpy as np
 from easygopigo3 import EasyGoPiGo3
 import time
@@ -39,6 +39,7 @@ class NavigateRajani:
                 self.gopi_easy.turn_degrees(turn_to_degree)
                 time.sleep(1)
                 for frame in self.camera.read():
+                    print(frame)
                     find_cone_obj = FindCones(color=cone_color)
                     flag, frame_back, total_cones, boxes, cones_data = find_cone_obj.find_cone(frame)
                     if total_cones > 0:
