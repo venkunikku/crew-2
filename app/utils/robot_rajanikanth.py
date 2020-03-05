@@ -33,6 +33,7 @@ class NavigateRajani:
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160]
+        find_cone_obj = FindCones(color=cone_color)
         if cone_color:
             while True:
                 for turn_to_degree in turn_deg_list:
@@ -40,7 +41,6 @@ class NavigateRajani:
                     self.gopi_easy.turn_degrees(turn_to_degree)
                     time.sleep(1)
                     frame = self.camera.read()
-                    find_cone_obj = FindCones(color=cone_color)
                     flag, frame_back, total_cones, boxes, cones_data = find_cone_obj.find_cone(frame)
                     if total_cones > 0:
                         return self
