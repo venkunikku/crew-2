@@ -33,6 +33,7 @@ class NavigateRajani:
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160]
+        find_cone_obj = FindCones(color=cone_color)
         if cone_color:
             while True:
                 for turn_to_degree in turn_deg_list:
