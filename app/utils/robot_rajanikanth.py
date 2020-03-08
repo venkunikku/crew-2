@@ -19,7 +19,7 @@ class NavigateRajani:
     @author: Venku Buragadda
     '''
 
-    def __init__(self, home_cone_color=None, show_video=False):
+    def __init__(self, home_cone_color=None, destination_cone_color=None, show_video=False):
         self.log = logging.getLogger("main.navigation")
         self.camera = StreamThreaded()
         self.home_cone_color = home_cone_color
@@ -28,19 +28,23 @@ class NavigateRajani:
         self.gopi_easy = EasyGoPiGo3()
         self.show_video = show_video
         self.cv2_window = None
-        
+
         self.hard_stop = False
-        
+
+        self.cone_data = None
+        self.find_cone_obj = FindCones(color=destination_cone_color)
+
         # This will open a new cv2 to show the video feed in a different thread.
         if self.show_video:
             self.cv2_window = Thread(target=self.show_video_feed, args=())
-            print("threade-2", self.cv2_window)
+            print("thread-2", self.cv2_window)
             self.cv2_window.start()
             print("Starting thread-2")
 
     def find_cone(self, cone_color=None):
-        turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160]
-        find_cone_obj = FindCones(color=cone_color)
+        turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
+                         -360]
+
         if cone_color:
             while True:
                 for turn_to_degree in turn_deg_list:
@@ -49,8 +53,9 @@ class NavigateRajani:
                     self.gopi_easy.turn_degrees(turn_to_degree)
                     time.sleep(2)
                     frame = self.camera.read()
-                    flag, frame_back, total_cones, boxes, cones_data = find_cone_obj.find_cone(frame)
+                    flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
                     if total_cones > 0:
+                        self.cone_data = cones_data
                         return self
                 else:
                     break
@@ -58,13 +63,95 @@ class NavigateRajani:
         else:
             raise ConeColorMissing("Cone color is required here and is missing")
 
+    def get_cone_coordinates(self, frame):
+        flag, frame_back, total_cones, boxes, cones_data = self.find_cone_obj.find_cone(frame)
+        return flag, frame_back, total_cones, boxes, cones_data
+
+    def center_the_cone(self, height_range=(280, 360)):
+
+        while True:
+            time.sleep(2)
+            frame = self.camera.read()
+            flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+            left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+                frame)
+            center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+
+            if not center_boundary_left_right_width[0] <= cones_data[0] <= center_boundary_left_right_width[1]:
+                print("Centring Cone")
+                if cones_data[0] > height_range[1]:
+                    # move right
+                    print(F"Moving right")
+                    self.gopi_easy.open_left_eye()
+                    self.gopi_easy.steer(1, 0)
+                    time.sleep(1)
+                    self.gopi_easy.stop()
+                    self.gopi_easy.close_left_eye()
+
+                if cones_data[0] < height_range[1]:
+                    # move left
+                    print(F"Moving left")
+                    self.gopi_easy.open_right_eye()
+
+                    self.gopi_easy.steer(0, 1)
+                    time.sleep(1)
+                    self.gopi_easy.close_right_eye()
+                    self.gopi_easy.stop()
+            else:
+                # getting update cone data after the robot is centered.
+                self.cone_data = cones_data
+                return self
+
+    def move_towards_the_cone(self, drive_inches=4):
+
+        while True:
+            self.center_the_cone()
+            frame = self.camera.read()
+            flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+            if total_cones:
+                cone_bottom_mid_point = self.get_cone_bottom_mid_point(boxes)
+                cone_lower_rec_boundary_mid_point_height = cone_bottom_mid_point[1]
+                center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
+                left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+                    frame)
+                bottom_boundary_upper_lower_height = (
+                    horiztl_line_upper_left_coord[1] + 20, horiztl_line_lower_left_coord[1] + 20)
+
+                if not bottom_boundary_upper_lower_height[0] <= cone_lower_rec_boundary_mid_point_height <= \
+                       bottom_boundary_upper_lower_height[1]:
+                    if bottom_boundary_upper_lower_height[0] > cone_lower_rec_boundary_mid_point_height:
+                        self.gopi_easy.drive_inches(drive_inches)
+                    else:
+                        self.gopi_easy.drive_inches(-drive_inches)
+                else:
+                    return self
+                self.center_the_cone()
+
+    def get_cone_bottom_mid_point(self, boxes):
+        x, y, w, h = boxes[0]
+        x1, y1, x4, y4 = (x, y, x + w, y + h)
+        # tl = (x1, y1)
+        # tr = (x4, y1)
+        br = (x4, y4)
+        bl = (x1, y4)
+        # # (tl, tr, br, bl) = boxes[0]
+        # (tlblX, tlblY) = NavigateRajani.midpoint(tl, bl)
+        # (trbrX, trbrY) = NavigateRajani.midpoint(tr, br)
+        rect_bottom_mind_point = NavigateRajani.midpoint(bl, br)
+        return rect_bottom_mind_point
+
+    @staticmethod
+    def midpoint(ptA, ptB):
+        return (ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5
+
     def show_video_feed(self):
         while True:
             frame = self.camera.read()
             if not (frame is None):
                 frame = NavigateRajani.center_boundaries(frame)
                 center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
-                left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
+                left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+                    frame)
 
                 cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
                 cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
@@ -108,7 +195,7 @@ class NavigateRajani:
 
     @staticmethod
     def center_boundaries(frame):
-        
+
         he, wi, ch = frame.shape
         center_of_the_screen = (wi // 2, he // 2)
         cv2.circle(frame, center_of_the_screen, 5, [255, 0, 0], -1)
@@ -134,4 +221,3 @@ class NavigateRajani:
         if self.show_video:
             self.cv2_window.join()
         cv2.destroyAllWindows()
-        
