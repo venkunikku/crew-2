@@ -78,12 +78,10 @@ class NavigateRajani:
             horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
             rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
             print(f"Cone data: {cones_data}")
-            print(f"Coordinates: ", center_of_screen_coord, horiztl_line_lower_left_coord,
-                  horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
-                  left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord,
-                  rigth_top_bound_line_coord, width)
+            print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
 
             center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+            print(f"Center Boundary", center_boundary_left_right_width)
 
             if not center_boundary_left_right_width[0] <= cones_data[0] <= center_boundary_left_right_width[1]:
                 print("Centring Cone")
