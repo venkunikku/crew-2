@@ -19,7 +19,7 @@ class NavigateRajani:
     @author: Venku Buragadda
     '''
 
-    def __init__(self, home_cone_color=None, destination_cone_color=None, show_video=False):
+    def __init__(self, home_cone_color=None, destination_cone_color="red", show_video=False):
         self.log = logging.getLogger("main.navigation")
         self.camera = StreamThreaded()
         self.home_cone_color = home_cone_color
@@ -65,6 +65,7 @@ class NavigateRajani:
 
     def get_cone_coordinates(self, frame):
         flag, frame_back, total_cones, boxes, cones_data = self.find_cone_obj.find_cone(frame)
+        print("Find code class called: ", total_cones)
         return flag, frame_back, total_cones, boxes, cones_data
 
     def center_the_cone(self, height_range=(280, 360)):
@@ -73,7 +74,7 @@ class NavigateRajani:
             time.sleep(2)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
-            left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+            center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
                 frame)
             center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
 
