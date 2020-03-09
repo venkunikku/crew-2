@@ -74,39 +74,42 @@ class NavigateRajani:
             time.sleep(2)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
-            center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, \
-            horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
-            rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
-            print(f"Cone data: {cones_data}")
-            print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
 
-            center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
-            print(f"Center Boundary", center_boundary_left_right_width)
+            if total_cones > 0:
+                cone_boudning_box = cones_data['cone-0']['bouding_box_center']
+                center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, \
+                horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
+                rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
+                print(f"Cone data: {cone_boudning_box}")
+                print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
 
-            if not center_boundary_left_right_width[0] <= cones_data[0] <= center_boundary_left_right_width[1]:
-                print("Centring Cone")
-                if cones_data[0] > height_range[1]:
-                    # move right
-                    print(F"Moving right")
-                    self.gopi_easy.open_left_eye()
-                    self.gopi_easy.steer(1, 0)
-                    time.sleep(1)
-                    self.gopi_easy.stop()
-                    self.gopi_easy.close_left_eye()
+                center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+                print(f"Center Boundary", center_boundary_left_right_width)
 
-                if cones_data[0] < height_range[1]:
-                    # move left
-                    print(F"Moving left")
-                    self.gopi_easy.open_right_eye()
+                if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[1]:
+                    print("Centring Cone")
+                    if cone_boudning_box[0] > height_range[1]:
+                        # move right
+                        print(F"Moving right")
+                        self.gopi_easy.open_left_eye()
+                        self.gopi_easy.steer(1, 0)
+                        time.sleep(1)
+                        self.gopi_easy.stop()
+                        self.gopi_easy.close_left_eye()
 
-                    self.gopi_easy.steer(0, 1)
-                    time.sleep(1)
-                    self.gopi_easy.close_right_eye()
-                    self.gopi_easy.stop()
-            else:
-                # getting update cone data after the robot is centered.
-                self.cone_data = cones_data
-                return self
+                    if cone_boudning_box[0] < height_range[1]:
+                        # move left
+                        print(F"Moving left")
+                        self.gopi_easy.open_right_eye()
+
+                        self.gopi_easy.steer(0, 1)
+                        time.sleep(1)
+                        self.gopi_easy.close_right_eye()
+                        self.gopi_easy.stop()
+                else:
+                    # getting update cone data after the robot is centered.
+                    self.cone_data = cones_data
+                    return self
 
     def move_towards_the_cone(self, drive_inches=4):
 
