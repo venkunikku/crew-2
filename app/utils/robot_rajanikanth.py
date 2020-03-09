@@ -74,8 +74,15 @@ class NavigateRajani:
             time.sleep(2)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
-            center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
-                frame)
+            center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, \
+            horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
+            rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
+            print(f"Cone data: {cones_data}")
+            print(f"Coordinates: ", center_of_screen_coord, horiztl_line_lower_left_coord,
+                  horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
+                  left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord,
+                  rigth_top_bound_line_coord, width)
+
             center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
 
             if not center_boundary_left_right_width[0] <= cones_data[0] <= center_boundary_left_right_width[1]:
@@ -115,6 +122,7 @@ class NavigateRajani:
                 center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
                 left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
                     frame)
+
                 bottom_boundary_upper_lower_height = (
                     horiztl_line_upper_left_coord[1] + 20, horiztl_line_lower_left_coord[1] + 20)
 
@@ -192,7 +200,9 @@ class NavigateRajani:
         # bottom boundaries
         horiztl_line_upper_left_coord, horiztl_line_upper_right_coord = (0, height - 100), (width, height - 100)
         horiztl_line_lower_left_coord, horiztl_line_lower_right_coord = (0, height - 50), (width, height - 50)
-        return center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width
+        return center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, \
+               horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, left_bottom_bound_line_coord, \
+               left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width
 
     @staticmethod
     def center_boundaries(frame):
