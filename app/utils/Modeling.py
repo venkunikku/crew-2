@@ -10,18 +10,21 @@ class InferImage():
                "sofa", "train", "tvmonitor"]
     COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
-    def __init__(self, image_path=None, confidence=0.5):
+    def __init__(self, confidence=0.5, tpu=True):
         self.net = cv2.dnn.readNetFromCaffe("../model_weights/mobile_net_ssd/MobileNetSSD_deploy.prototxt",
                                             "../model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
-        self.image_path = image_path
-        self.image = cv2.imread(self.image_path)
+        self.tpu = tpu
+        if self.tpu:
+            self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
+
         self.resized_image = None
         self.confidence = confidence
 
-    def infer(self):
-        self.resize_image()
-        (h, w) = self.image.shape[:2]
-        blob = cv2.dnn.blobFromImage(self.image, 0.007843, (300, 300), 127.5)
+    def infer(self, image_path=None):
+        image = cv2.imread(image_path)
+        image = InferImage.resize_image(image)
+        (h, w) = image.shape[:2]
+        blob = cv2.dnn.blobFromImage(image, 0.007843, (300, 300), 127.5)
         self.net.setInput(blob)
         detections = self.net.forward()
         for idx, i in enumerate(np.arange(0, detections.shape[2])):
@@ -43,16 +46,18 @@ class InferImage():
                 label = "{}: {:.2f}%".format(self.CLASSES[idx],
                                              confidence * 100)
                 print(f"Labels of the image : {label} ")
-                cv2.rectangle(self.image, (startX, startY), (endX, endY),
+                cv2.rectangle(image, (startX, startY), (endX, endY),
                               self.COLORS[idx], 2)
                 y = startY - 15 if startY - 15 > 15 else startY + 15
-                cv2.putText(self.image, label, (startX, y),
+                cv2.putText(image, label, (startX, y),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
 
             # cv2.imwrite()
 
-    def resize_image(self, width=400):
-        (h, w) = self.image.shape[:2]
+    @staticmethod
+    def resize_image(self, image, width=400):
+        (h, w) = image.shape[:2]
         r = width / float(w)
         dim = (width, int(h * r))
-        self.resized_image = cv2.resize(self.image, dim, interpolation=cv2.INTER_AREA)
+        resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+        return resized_image
