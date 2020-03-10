@@ -30,6 +30,7 @@ if __name__ == '__main__':
     logger.info("Creating the the object for Robot class")
     with robot_rajanikanth.NavigateRajani(show_video=True) as test:
         print(test.find_cone(cone_color="red").center_the_cone())
+        input("press key to stop")
 
 # 	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()
 # 	#cam = VideoStream.StreamThreaded().start()

@@ -68,7 +68,7 @@ class NavigateRajani:
         print("Find code class called: ", total_cones)
         return flag, frame_back, total_cones, boxes, cones_data
 
-    def center_the_cone(self, height_range=(280, 360)):
+    def center_the_cone(self, height_range=(280, 360), precise=False):
 
         while True:
             time.sleep(2)
@@ -82,8 +82,12 @@ class NavigateRajani:
                 rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
                 print(f"Cone data: {cone_boudning_box}")
                 print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
-
-                center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+                steer = 1
+                if precise:
+                    center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+                else:
+                    center_boundary_left_right_width = (left_top_bound_line_coord[0]-10, rigth_top_bound_line_coord[0]+10)
+                    steer = 3
                 print(f"Center Boundary", center_boundary_left_right_width)
 
                 if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[1]:
@@ -92,7 +96,7 @@ class NavigateRajani:
                         # move right
                         print(F"Moving right")
                         self.gopi_easy.open_left_eye()
-                        self.gopi_easy.steer(1, 0)
+                        self.gopi_easy.steer(steer, 0)
                         time.sleep(1)
                         self.gopi_easy.stop()
                         self.gopi_easy.close_left_eye()
@@ -102,7 +106,7 @@ class NavigateRajani:
                         print(F"Moving left")
                         self.gopi_easy.open_right_eye()
 
-                        self.gopi_easy.steer(0, 1)
+                        self.gopi_easy.steer(0, steer)
                         time.sleep(1)
                         self.gopi_easy.close_right_eye()
                         self.gopi_easy.stop()
@@ -183,6 +187,13 @@ class NavigateRajani:
 
                 # cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
                 #             cv2.LINE_AA)
+                flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+                if total_cones:
+                    rect_bottom_mind_point = self.get_cone_bottom_mid_point(boxes)
+                    cv2.putText(frame_back, f"bottom: {rect_bottom_mind_point}",
+                                (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])), cv2.FONT_HERSHEY_SIMPLEX,
+                                .5, (0, 255, 255), 1, cv2.LINE_AA)
+                    frame = frame_back
 
                 cv2.imshow("Video Feed", frame)
                 if self.hard_stop:
