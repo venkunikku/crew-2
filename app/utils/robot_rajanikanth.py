@@ -65,7 +65,7 @@ class NavigateRajani:
 
     def get_cone_coordinates(self, frame):
         flag, frame_back, total_cones, boxes, cones_data = self.find_cone_obj.find_cone(frame)
-        print("Find code class called: ", total_cones)
+        #print("Find code class called: ", total_cones)
         return flag, frame_back, total_cones, boxes, cones_data
 
     def center_the_cone(self, height_range=(280, 360), precise=False):
@@ -85,9 +85,11 @@ class NavigateRajani:
                 steer = 1
                 if precise:
                     center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+                    self.gopi_easy.set_eye_color((255,0,255))
                 else:
-                    center_boundary_left_right_width = (left_top_bound_line_coord[0]-10, rigth_top_bound_line_coord[0]+10)
+                    center_boundary_left_right_width = (left_top_bound_line_coord[0]-40, rigth_top_bound_line_coord[0]+40)
                     steer = 3
+                    self.gopi_easy.set_eye_color((0,255,127))
                 print(f"Center Boundary", center_boundary_left_right_width)
 
                 if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[1]:
@@ -123,10 +125,14 @@ class NavigateRajani:
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
             if total_cones:
                 cone_bottom_mid_point = self.get_cone_bottom_mid_point(boxes)
+                
+                # Cone rectangel box bottom line mid point
                 cone_lower_rec_boundary_mid_point_height = cone_bottom_mid_point[1]
                 center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
                 left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
                     frame)
+                
+                # Screen bottom box line. top(upper) bottom(lower) left coordinates of Y
 
                 bottom_boundary_upper_lower_height = (
                     horiztl_line_upper_left_coord[1] + 20, horiztl_line_lower_left_coord[1] + 20)
@@ -137,9 +143,27 @@ class NavigateRajani:
                         self.gopi_easy.drive_inches(drive_inches)
                     else:
                         self.gopi_easy.drive_inches(-drive_inches)
+                elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
+                    self.gopi_easy.drive_inches(-1)                
                 else:
+                    self.center_the_cone(precise=True)
                     return self
-                self.center_the_cone()
+                self.center_the_cone(precise=False)
+                
+    def circle_the_cone(self, carpet=False):
+        
+        self.gopi_easy.turn_degrees(-90)
+        if carpet:
+            self.gopi_easy.orbit(480, 60)
+        else:
+            self.gopi_easy.orbit(90, 60)
+            time.sleep(5)
+            self.gopi_easy.orbit(90, 60)
+            time.sleep(2)
+            self.gopi_easy.orbit(90, 60)
+            self.gopi_easy.orbit(90, 60)
+        self.gopi_easy.turn_degrees(90)
+        self.gopi_easy.turn_degrees(220)
 
     def get_cone_bottom_mid_point(self, boxes):
         x, y, w, h = boxes[0]
