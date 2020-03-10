@@ -157,9 +157,11 @@ class NavigateRajani:
             self.gopi_easy.orbit(480, 60)
         else:
             self.gopi_easy.orbit(90, 60)
-            time.sleep(5)
+            time.sleep(2)
+            self.camera.camera.capture('foo.jpg')
             self.gopi_easy.orbit(90, 60)
             time.sleep(2)
+            #self.camera.read().capture('/home/pi/foo.jpg', use_video_port=True)
             self.gopi_easy.orbit(90, 60)
             self.gopi_easy.orbit(90, 60)
         self.gopi_easy.turn_degrees(90)
