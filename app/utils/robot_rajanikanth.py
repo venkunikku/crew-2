@@ -26,6 +26,7 @@ class NavigateRajani:
         self.camera.start()
 
         self.gopi_easy = EasyGoPiGo3()
+        self.servo = self.gopi_easy.init_servo()
         self.show_video = show_video
         self.cv2_window = None
 
@@ -93,7 +94,7 @@ class NavigateRajani:
                 print(f"Center Boundary", center_boundary_left_right_width)
 
                 if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[1]:
-                    print("Centring Cone")
+                    print(f"Centring Cone: {cone_boudning_box[0] > height_range[1]} and the values {cone_boudning_box[0]} and {height_range[1]}")
                     if cone_boudning_box[0] > height_range[1]:
                         # move right
                         print(F"Moving right")
@@ -158,7 +159,9 @@ class NavigateRajani:
         else:
             self.gopi_easy.orbit(90, 60)
             time.sleep(2)
+            self.servo.rotate_servo(90)
             self.camera.camera.capture('foo.jpg')
+            self.servo.rotate_servo(-90)
             self.gopi_easy.orbit(90, 60)
             time.sleep(2)
             #self.camera.read().capture('/home/pi/foo.jpg', use_video_port=True)
