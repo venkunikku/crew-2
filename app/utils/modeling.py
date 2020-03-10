@@ -1,6 +1,7 @@
 import time
 import cv2
 import numpy as np
+from threading import Thread
 
 
 class InferImage():
@@ -19,6 +20,9 @@ class InferImage():
 
         self.resized_image = None
         self.confidence = confidence
+
+    def run(self):
+        pass
 
     def infer(self, image_path=None):
         image = cv2.imread(image_path)
@@ -61,3 +65,50 @@ class InferImage():
         dim = (width, int(h * r))
         resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
         return resized_image
+
+
+def infer_image(q, confidence):
+    while True:
+        image_path = q.get()
+        if image_path:
+            CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
+                       "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+                       "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+                       "sofa", "train", "tvmonitor"]
+            COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
+            net = cv2.dnn.readNetFromCaffe("../model_weights/mobile_net_ssd/MobileNetSSD_deploy.prototxt",
+                                           "../model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
+            net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
+            image = cv2.imread(image_path)
+            width = 400
+            (h, w) = image.shape[:2]
+            r = width / float(w)
+            dim = (width, int(h * r))
+            resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+            blob = cv2.dnn.blobFromImage(image, 0.007843, (300, 300), 127.5)
+            net.setInput(blob)
+            detections = net.forward()
+            for idx, i in enumerate(np.arange(0, detections.shape[2])):
+                # extract the confidence (i.e., probability) associated with
+                # the prediction
+                confidence = detections[0, 0, i, 2]
+
+                # filter out weak detections by ensuring the `confidence` is
+                # greater than the minimum confidence
+                if confidence > confidence:
+                    # extract the index of the class label from the
+                    # `detections`, then compute the (x, y)-coordinates of
+                    # the bounding box for the object
+                    idx = int(detections[0, 0, i, 1])
+                    box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                    (startX, startY, endX, endY) = box.astype("int")
+
+                    # draw the prediction on the frame
+                    label = "{}: {:.2f}%".format(CLASSES[idx],
+                                                 confidence * 100)
+                    print(f"Labels of the image : {label} ")
+                    cv2.rectangle(image, (startX, startY), (endX, endY),
+                                  COLORS[idx], 2)
+                    y = startY - 15 if startY - 15 > 15 else startY + 15
+                    cv2.putText(image, label, (startX, y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)

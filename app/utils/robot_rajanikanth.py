@@ -1,5 +1,6 @@
 from app.utils.video_stream import StreamThreaded
 from app.utils.robot_custome_exception import ConeColorMissing
+from app.utils.modeling import infer_image
 import cv2
 from threading import Thread
 from app.utils.find_objects import FindCones
@@ -7,7 +8,7 @@ import numpy as np
 from easygopigo3 import EasyGoPiGo3
 import time
 import logging
-
+from queue import Queue
 '''
 @newfield team: Venku Buragadda
 '''
@@ -19,7 +20,7 @@ class NavigateRajani:
     @author: Venku Buragadda
     '''
 
-    def __init__(self, home_cone_color=None, destination_cone_color="red", show_video=False):
+    def __init__(self, home_cone_color=None, destination_cone_color="red", show_video=False, inference=False):
         self.log = logging.getLogger("main.navigation")
         self.camera = StreamThreaded()
         self.home_cone_color = home_cone_color
@@ -28,7 +29,7 @@ class NavigateRajani:
         self.gopi_easy = EasyGoPiGo3()
         self.servo = self.gopi_easy.init_servo()
         self.servo.reset_servo()
-        
+
         self.show_video = show_video
         self.cv2_window = None
 
@@ -43,6 +44,13 @@ class NavigateRajani:
             print("thread-2", self.cv2_window)
             self.cv2_window.start()
             print("Starting thread-2")
+
+        self.inference = inference
+        self.img_inference = None
+        self.q = None
+        if self.inference:
+            self.q = Queue()
+            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5 )).start()
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
@@ -68,7 +76,7 @@ class NavigateRajani:
 
     def get_cone_coordinates(self, frame):
         flag, frame_back, total_cones, boxes, cones_data = self.find_cone_obj.find_cone(frame)
-        #print("Find code class called: ", total_cones)
+        # print("Find code class called: ", total_cones)
         return flag, frame_back, total_cones, boxes, cones_data
 
     def center_the_cone(self, height_range=(280, 360), precise=False):
@@ -88,15 +96,18 @@ class NavigateRajani:
                 steer = 1
                 if precise:
                     center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
-                    self.gopi_easy.set_eye_color((255,0,255))
+                    self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
-                    center_boundary_left_right_width = (left_top_bound_line_coord[0]-40, rigth_top_bound_line_coord[0]+40)
+                    center_boundary_left_right_width = (
+                        left_top_bound_line_coord[0] - 40, rigth_top_bound_line_coord[0] + 40)
                     steer = 3
-                    self.gopi_easy.set_eye_color((0,255,127))
+                    self.gopi_easy.set_eye_color((0, 255, 127))
                 print(f"Center Boundary", center_boundary_left_right_width)
 
-                if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[1]:
-                    print(f"Centring Cone: {cone_boudning_box[0] > height_range[1]} and the values {cone_boudning_box[0]} and {height_range[1]}")
+                if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[
+                    1]:
+                    print(
+                        f"Centring Cone: {cone_boudning_box[0] > height_range[1]} and the values {cone_boudning_box[0]} and {height_range[1]}")
                     if cone_boudning_box[0] > height_range[1]:
                         # move right
                         print(F"Moving right")
@@ -128,13 +139,13 @@ class NavigateRajani:
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
             if total_cones:
                 cone_bottom_mid_point = self.get_cone_bottom_mid_point(boxes)
-                
+
                 # Cone rectangel box bottom line mid point
                 cone_lower_rec_boundary_mid_point_height = cone_bottom_mid_point[1]
                 center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
                 left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
                     frame)
-                
+
                 # Screen bottom box line. top(upper) bottom(lower) left coordinates of Y
 
                 bottom_boundary_upper_lower_height = (
@@ -147,14 +158,14 @@ class NavigateRajani:
                     else:
                         self.gopi_easy.drive_inches(-drive_inches)
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
-                    self.gopi_easy.drive_inches(-1)                
+                    self.gopi_easy.drive_inches(-1)
                 else:
                     self.center_the_cone(precise=True)
                     return self
                 self.center_the_cone(precise=False)
-                
+
     def circle_the_cone(self, carpet=False):
-        
+
         self.gopi_easy.turn_degrees(-90)
         if carpet:
             self.gopi_easy.orbit(480, 60)
@@ -165,9 +176,9 @@ class NavigateRajani:
             time.sleep(1)
             self.camera.camera.capture('foo1.jpg')
             time.sleep(2)
-            
+
             self.gopi_easy.orbit(80, 60)
-            
+
             time.sleep(2)
             self.camera.camera.capture('foo2.jpg')
             self.gopi_easy.orbit(75, 60)
@@ -177,6 +188,9 @@ class NavigateRajani:
             self.servo.reset_servo()
         self.gopi_easy.turn_degrees(90)
         self.gopi_easy.turn_degrees(220)
+
+    def infer_image(self, image_path):
+        self.q.put(image_path)
 
     def get_cone_bottom_mid_point(self, boxes):
         x, y, w, h = boxes[0]
@@ -228,7 +242,8 @@ class NavigateRajani:
                 if total_cones:
                     rect_bottom_mind_point = self.get_cone_bottom_mid_point(boxes)
                     cv2.putText(frame_back, f"bottom: {rect_bottom_mind_point}",
-                                (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])), cv2.FONT_HERSHEY_SIMPLEX,
+                                (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])),
+                                cv2.FONT_HERSHEY_SIMPLEX,
                                 .5, (0, 255, 255), 1, cv2.LINE_AA)
                     frame = frame_back
 
