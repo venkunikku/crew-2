@@ -27,6 +27,8 @@ class NavigateRajani:
 
         self.gopi_easy = EasyGoPiGo3()
         self.servo = self.gopi_easy.init_servo()
+        self.servo.reset_servo()
+        
         self.show_video = show_video
         self.cv2_window = None
 
@@ -157,16 +159,22 @@ class NavigateRajani:
         if carpet:
             self.gopi_easy.orbit(480, 60)
         else:
-            self.gopi_easy.orbit(90, 60)
+            self.gopi_easy.orbit(85, 60)
+            self.servo.reset_servo()
+            self.servo.rotate_servo(10)
+            time.sleep(1)
+            self.camera.camera.capture('foo1.jpg')
             time.sleep(2)
-            self.servo.rotate_servo(90)
-            self.camera.camera.capture('foo.jpg')
-            self.servo.rotate_servo(-90)
-            self.gopi_easy.orbit(90, 60)
+            
+            self.gopi_easy.orbit(80, 60)
+            
             time.sleep(2)
-            #self.camera.read().capture('/home/pi/foo.jpg', use_video_port=True)
-            self.gopi_easy.orbit(90, 60)
-            self.gopi_easy.orbit(90, 60)
+            self.camera.camera.capture('foo2.jpg')
+            self.gopi_easy.orbit(75, 60)
+            time.sleep(2)
+            self.camera.camera.capture('foo3.jpg')
+            self.gopi_easy.orbit(120, 60)
+            self.servo.reset_servo()
         self.gopi_easy.turn_degrees(90)
         self.gopi_easy.turn_degrees(220)
 
