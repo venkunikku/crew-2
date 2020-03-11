@@ -85,18 +85,22 @@ class NavigateRajani:
         horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
         rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
         while True:
-            time.sleep(3)
+            #time.sleep(3)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
 
             if total_cones > 0:
-                cone_boudning_box = cones_data['cone-0']['bouding_box_center']
+                cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
-                print(f"Cone data: {cone_boudning_box}")
+                print(f"Cone data: {cone_bounding_box}")
                 print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
                 steer = 1
                 if precise:
-                    time.sleep(2)
+                    time.sleep(1)
+                    frame = self.camera.read()
+                    flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+                    cone_bounding_box = cones_data['cone-0']['bouding_box_center']
+
                     center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
                     self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
@@ -106,11 +110,11 @@ class NavigateRajani:
                     self.gopi_easy.set_eye_color((0, 255, 127))
                 print(f"Center Boundary", center_boundary_left_right_width)
 
-                if not center_boundary_left_right_width[0] <= cone_boudning_box[0] <= center_boundary_left_right_width[
+                if not center_boundary_left_right_width[0] <= cone_bounding_box[0] <= center_boundary_left_right_width[
                     1]:
                     print(
-                        f"Centring Cone: {cone_boudning_box[0] > height_range[1]} and the values {cone_boudning_box[0]} and {height_range[1]}")
-                    if cone_boudning_box[0] > height_range[1]:
+                        f"Centring Cone: {cone_bounding_box[0] > height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
+                    if cone_bounding_box[0] > height_range[1]:
                         # move right
                         print(F"Moving right")
                         self.gopi_easy.open_left_eye()
@@ -119,7 +123,7 @@ class NavigateRajani:
                         self.gopi_easy.stop()
                         self.gopi_easy.close_left_eye()
 
-                    if cone_boudning_box[0] < height_range[1]:
+                    if cone_bounding_box[0] < height_range[1]:
                         # move left
                         print(F"Moving left")
                         self.gopi_easy.open_right_eye()
