@@ -11,7 +11,7 @@ class FindCones:
 
         },
         "yellow": {
-            "lower_c": [np.array([15, 112, 221]), np.array([45, 255, 255])]
+            "lower_c": [np.array([19, 167, 140]), np.array([119, 255, 255])] # [np.array([15, 112, 221]), np.array([45, 255, 255])]
 
         },
         "green": {
