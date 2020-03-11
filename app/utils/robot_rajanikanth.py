@@ -50,7 +50,7 @@ class NavigateRajani:
         self.q = None
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5 )).start()
+            self.img_inference = Thread(target=infer_image, args=(self.q, 0.1 )).start()
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,

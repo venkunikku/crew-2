@@ -67,35 +67,44 @@ class InferImage():
         return resized_image
 
 
-def infer_image(q, confidence):
+def infer_image(q, conf):
+    net = cv2.dnn.readNetFromCaffe("./model_weights/mobile_net_ssd/MobileNetSSD_deploy.prototxt",
+                                           "./model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
     while True:
         image_path = q.get()
+        print(f"Image we got for the image in the queue:", image_path)
         if image_path:
+            print(f"yes we got an image")
             CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                        "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
                        "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
                        "sofa", "train", "tvmonitor"]
             COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
-            net = cv2.dnn.readNetFromCaffe("../model_weights/mobile_net_ssd/MobileNetSSD_deploy.prototxt",
-                                           "../model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
-            net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
+            
             image = cv2.imread(image_path)
+            #print(image)
             width = 400
             (h, w) = image.shape[:2]
             r = width / float(w)
             dim = (width, int(h * r))
+            
+            print(f"Resizing done")
             resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
             blob = cv2.dnn.blobFromImage(image, 0.007843, (300, 300), 127.5)
+            print("Puitting into setInput")
             net.setInput(blob)
+            print("forwarding")
             detections = net.forward()
             for idx, i in enumerate(np.arange(0, detections.shape[2])):
+                #print("Inside for loop")
                 # extract the confidence (i.e., probability) associated with
                 # the prediction
                 confidence = detections[0, 0, i, 2]
 
                 # filter out weak detections by ensuring the `confidence` is
                 # greater than the minimum confidence
-                if confidence > confidence:
+                if confidence > conf:
                     # extract the index of the class label from the
                     # `detections`, then compute the (x, y)-coordinates of
                     # the bounding box for the object
@@ -112,3 +121,6 @@ def infer_image(q, confidence):
                     y = startY - 15 if startY - 15 > 15 else startY + 15
                     cv2.putText(image, label, (startX, y),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+                    cv2.imwrite("{}_inference.png".format(idx), image)
+                            
+    
