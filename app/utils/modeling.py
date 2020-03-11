@@ -4,7 +4,7 @@ import numpy as np
 from threading import Thread
 
 
-class InferImage():
+class InferImage:
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
                "dog", "horse", "motorbike", "person", "pottedplant", "sheep",

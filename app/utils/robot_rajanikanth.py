@@ -9,6 +9,7 @@ from easygopigo3 import EasyGoPiGo3
 import time
 import logging
 from queue import Queue
+
 '''
 @newfield team: Venku Buragadda
 '''
@@ -20,7 +21,8 @@ class NavigateRajani:
     @author: Venku Buragadda
     '''
 
-    def __init__(self, home_cone_color=None, destination_cone_color="red", show_video=False, inference=False):
+    def __init__(self, home_cone_color="yellow", destination_cone_color="red",
+                 show_video=False, show_video_limit=True, inference=False):
         self.log = logging.getLogger("main.navigation")
         self.camera = StreamThreaded()
         self.home_cone_color = home_cone_color
@@ -32,7 +34,7 @@ class NavigateRajani:
 
         self.show_video = show_video
         self.cv2_window = None
-
+        self.show_video_limit = show_video_limit
         self.hard_stop = False
 
         self.cone_data = None
@@ -50,29 +52,25 @@ class NavigateRajani:
         self.q = None
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5 )).start()
+            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5)).start()
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
                          -360]
 
-        if cone_color:
-            while True:
-                for turn_to_degree in turn_deg_list:
-                    print("Checking Degree", turn_to_degree)
-                    self.log.info(f"Moving to the following degree {turn_to_degree}")
-                    self.gopi_easy.turn_degrees(turn_to_degree)
-                    time.sleep(2)
-                    frame = self.camera.read()
-                    flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
-                    if total_cones > 0:
-                        self.cone_data = cones_data
-                        return self
-                else:
-                    break
-
-        else:
-            raise ConeColorMissing("Cone color is required here and is missing")
+        while True:
+            for turn_to_degree in turn_deg_list:
+                print("Checking Degree", turn_to_degree)
+                self.log.info(f"Moving to the following degree {turn_to_degree}")
+                self.gopi_easy.turn_degrees(turn_to_degree)
+                time.sleep(2)
+                frame = self.camera.read()
+                flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+                if total_cones > 0:
+                    self.cone_data = cones_data
+                    return self
+            else:
+                break
 
     def get_cone_coordinates(self, frame):
         flag, frame_back, total_cones, boxes, cones_data = self.find_cone_obj.find_cone(frame)
@@ -82,7 +80,7 @@ class NavigateRajani:
     def center_the_cone(self, height_range=(280, 360), precise=False):
 
         while True:
-            time.sleep(2)
+            #time.sleep(2)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
 
@@ -192,6 +190,13 @@ class NavigateRajani:
     def infer_image(self, image_path):
         self.q.put(image_path)
 
+    def there_is_nothing_like_home(self):
+        self.find_cone_obj = FindCones(color=self.home_cone_color)
+        self.find_cone().center_the_cone(precise=False).move_towards_the_cone()
+        self.gopi_easy.drive_inches(15)
+        self.gopi_easy.drive_inches(120)
+        return self
+
     def get_cone_bottom_mid_point(self, boxes):
         x, y, w, h = boxes[0]
         x1, y1, x4, y4 = (x, y, x + w, y + h)
@@ -213,28 +218,29 @@ class NavigateRajani:
         while True:
             frame = self.camera.read()
             if not (frame is None):
-                frame = NavigateRajani.center_boundaries(frame)
-                center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
-                left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
-                    frame)
+                if not self.show_video_limit:
+                    frame = NavigateRajani.center_boundaries(frame)
+                    center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
+                    left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+                        frame)
 
-                cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
-                cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
+                    cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
+                    cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
 
-                cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
+                    cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
 
-                # Center vertical line
-                cv2.line(frame, (center_of_screen_coord[0], 0), (center_of_screen_coord[0], width), [0, 255, 0], 1)
+                    # Center vertical line
+                    cv2.line(frame, (center_of_screen_coord[0], 0), (center_of_screen_coord[0], width), [0, 255, 0], 1)
 
-                cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)
-                cv2.line(frame, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, [200, 90, 60], 1)
+                    cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)
+                    cv2.line(frame, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, [200, 90, 60], 1)
 
-                cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}",
-                            horiztl_line_upper_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
-                            (0, 255, 255), 1, cv2.LINE_AA)
-                cv2.putText(frame, f"Lower: {horiztl_line_lower_left_coord},{horiztl_line_lower_right_coord}",
-                            horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
-                            (0, 255, 255), 1, cv2.LINE_AA)
+                    cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}",
+                                horiztl_line_upper_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
+                                (0, 255, 255), 1, cv2.LINE_AA)
+                    cv2.putText(frame, f"Lower: {horiztl_line_lower_left_coord},{horiztl_line_lower_right_coord}",
+                                horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
+                                (0, 255, 255), 1, cv2.LINE_AA)
 
                 # cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
                 #             cv2.LINE_AA)
