@@ -79,17 +79,18 @@ class NavigateRajani:
         return flag, frame_back, total_cones, boxes, cones_data
 
     def center_the_cone(self, height_range=(280, 360), precise=False):
-
+        frame = self.camera.read()
+        center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, \
+        horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
+        rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
         while True:
-            #time.sleep(2)
+            time.sleep(3)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
 
             if total_cones > 0:
                 cone_boudning_box = cones_data['cone-0']['bouding_box_center']
-                center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, \
-                horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
-                rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
+
                 print(f"Cone data: {cone_boudning_box}")
                 print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
                 steer = 1
@@ -216,14 +217,16 @@ class NavigateRajani:
         return (ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5
 
     def show_video_feed(self):
+        frame = self.camera.read()
+        center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
+        left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+            frame)
         while True:
             frame = self.camera.read()
             if not (frame is None):
                 if not self.show_video_limit:
                     frame = NavigateRajani.center_boundaries(frame)
-                    center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
-                    left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
-                        frame)
+
 
                     cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
                     cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
