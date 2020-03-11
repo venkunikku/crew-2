@@ -52,7 +52,8 @@ class NavigateRajani:
         self.q = None
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.1 )).start()
+            self.img_inference = Thread(target=infer_image, args=(self.q, 0.1 ))
+            self.img_inference.start()
 
 
     def find_cone(self, cone_color=None):
@@ -94,6 +95,7 @@ class NavigateRajani:
                 print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
                 steer = 1
                 if precise:
+                    time.sleep(2)
                     center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
                     self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
@@ -130,7 +132,7 @@ class NavigateRajani:
                     self.cone_data = cones_data
                     return self
 
-    def move_towards_the_cone(self, drive_inches=4):
+    def move_towards_the_cone(self, drive_inches=3):
 
         while True:
             self.center_the_cone()
@@ -158,6 +160,7 @@ class NavigateRajani:
                         self.gopi_easy.drive_inches(-drive_inches)
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
                     self.gopi_easy.drive_inches(-1)
+                    
                 else:
                     self.center_the_cone(precise=True)
                     return self
@@ -174,7 +177,9 @@ class NavigateRajani:
             self.servo.rotate_servo(10)
             time.sleep(1)
             self.camera.camera.capture('foo1.jpg')
+            
             time.sleep(2)
+            self.infer_image('foo1.jpg')
 
             self.gopi_easy.orbit(80, 60)
 
@@ -182,11 +187,13 @@ class NavigateRajani:
             self.camera.camera.capture('foo2.jpg')
             self.gopi_easy.orbit(75, 60)
             time.sleep(2)
+            self.infer_image('foo2.jpg')
             self.camera.camera.capture('foo3.jpg')
             self.gopi_easy.orbit(120, 60)
             self.servo.reset_servo()
         self.gopi_easy.turn_degrees(90)
         self.gopi_easy.turn_degrees(220)
+        return self
 
     def infer_image(self, image_path):
         self.q.put(image_path)
@@ -194,8 +201,8 @@ class NavigateRajani:
     def there_is_nothing_like_home(self):
         self.find_cone_obj = FindCones(color=self.home_cone_color)
         self.find_cone().center_the_cone(precise=False).move_towards_the_cone()
-        self.gopi_easy.drive_inches(15)
-        self.gopi_easy.drive_inches(120)
+        self.gopi_easy.drive_inches(10)
+        self.gopi_easy.turn_degrees(180)
         return self
 
     def get_cone_bottom_mid_point(self, boxes):
@@ -302,4 +309,6 @@ class NavigateRajani:
         self.camera.stop()
         if self.show_video:
             self.cv2_window.join()
+        if self.inference:
+            self.img_inference.join()
         cv2.destroyAllWindows()

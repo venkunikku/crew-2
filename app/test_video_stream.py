@@ -28,10 +28,11 @@ if __name__ == '__main__':
     
 
     logger.info("Creating the the object for Robot class")
-    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as test:
-        #print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(drive_inches=8).circle_the_cone())
+    with robot_rajanikanth.NavigateRajani(show_video=True, inference=False) as test:
+        print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home())
         #print(test.circle_the_cone())
-        print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
+        #print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
+        #print(test.there_is_nothing_like_home())
         input("press key to stop")
 
 # 	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()
