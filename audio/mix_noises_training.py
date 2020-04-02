@@ -13,6 +13,10 @@ down_sampled_training_dir = '../../training_downsampled/'
 noise_downsampled_dir = '../../noise_downsampled/'
 target_dir = '../../mixed/'
 
+"""
+randomly mixes clean audio files and noise and stores in designated directory
+"""
+
 # delete all existing contents
 files = glob.glob(target_dir + '*')
 for f in files:

@@ -7,8 +7,8 @@ from python_speech_features import mfcc, logfbank
 class feature_extraction():
 
 	def __init__(self,
-		mixed_dir = "/../../mixed/",
-		processed_dir = "/../../training_processed/",
+		mixed_dir = "../../mixed/",
+		processed_dir = "../../training_processed/",
 		sampling_freq = 44100):
 
 		self.mixed_dir = mixed_dir
@@ -24,7 +24,7 @@ class feature_extraction():
 		filepath = self.mixed_dir + filename
 		sf, time_signal = wavfile.read(filepath, mmap=True)
 
-		if normalize=True:
+		if normalize==True:
 			# normalization, assuming 2^15 is the highest possible quantization
 			time_signal = time_signal/np.power(2,15)
 
@@ -40,7 +40,7 @@ class feature_extraction():
 		(i.e. the number of time steps).
 		"""
 
-		if normalize=True:
+		if normalize==True:
 			# Dividing first half of DFT (freq signal) by sampling freq (len signal)
 			len_signal = len(time_signal)
 			len_half = np.ceil((len_signal + 1) / 2.0).astype(np.int)
@@ -62,17 +62,18 @@ class feature_extraction():
 		len_signal = len(signal)
 
 		if len_signal % 2:
-    		freq_signal[1:len_fts] *= 2
+			freq_signal[1:len_fts] *= 2
+
 		else:
-    		freq_signal[1:len_fts-1] *= 2
+			freq_signal[1:len_fts-1] *= 2
 
-    	return freq_signal
+		return freq_signal
 
-    def return_mfcc(self, time_signal)
+	def return_mfcc(self, time_signal):
 
-    	features_mfcc = mfcc(signal, self.sampling_freq)
-    	
-    	return features_mfcc
+		features_mfcc = mfcc(time_signal, self.sampling_freq)
+		
+		return features_mfcc
 
 
 
