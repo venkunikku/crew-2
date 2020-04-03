@@ -69,9 +69,9 @@ class feature_extraction():
 
 		return freq_signal
 
-	def return_mfcc(self, time_signal):
+	def return_mfcc(self, time_signal, num_cep=13):
 
-		features_mfcc = mfcc(time_signal, self.sampling_freq)
+		features_mfcc = mfcc(time_signal, self.sampling_freq, num_cep)
 		
 		return features_mfcc
 
