@@ -1,5 +1,0 @@
-pip install SOMPY-master.zip
-Then I had to install ipdb:
-pip install ipdb
-And dowgrade it:
-pip install ipdb==0.8.1

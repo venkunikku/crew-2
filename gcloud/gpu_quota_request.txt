@@ -1,0 +1,1 @@
+I do deep learning work in NLP and am trying to train a Transformer using 45+ GB of text data. Pretty agnostic to region at this point. 
