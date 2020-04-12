@@ -1,0 +1,23 @@
+### Set up environmental variables ###
+# Multiple GPUs on Master; N Workers are to be preemptible
+
+export PROJECT_NAME=audio-detection
+export PROJECT_ID=audio-detection-1 # project_id needs to be updated here for new project
+export VM_NAME=ad-vm
+
+export BUCKET_NAME=ad-bucket-15730 # needs to be updated here for new projects
+export BUCKET_SA=ad-bucket-sa
+
+export ZONE=asia-east1-a
+
+export MCHN_TYPE=n1-highmem-4
+export SD_SIZE=500GB
+export ACCELERATOR_TYPE=nvidia-tesla-k80
+export ACCELERATOR_COUNT=1
+
+export IMAGE_VERSION=ubuntu-1804-lts
+
+export PYTHON_VERSION=3.7
+export SPARK_VERSION=2.4.4
+export HADOOP_VERSION=2.7
+
