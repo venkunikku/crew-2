@@ -1,7 +1,14 @@
 from pydub import AudioSegment
 import numpy as np
+import gcsfs
 
-noise_downsampled_dir = "../../noise_downsampled/"
+gcp = False
+
+if gcp == False:
+    noise_downsampled_dir = "../../noise_downsampled/"
+    
+else:
+    noise_downsampled_dir = "gs://ad-bucket-15730/noise_downsampled/"
 
 audio_file = noise_downsampled_dir + "combined-noise.wav"
 audio = AudioSegment.from_wav(audio_file)

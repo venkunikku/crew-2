@@ -3,16 +3,24 @@ import numpy as np
 import os
 import scipy.io.wavfile as wavfile
 from python_speech_features import mfcc, logfbank
+import gcsfs
 
 class feature_extraction():
 
 	def __init__(self,
 		mixed_dir = "../../mixed/",
 		processed_dir = "../../training_processed/",
-		sampling_freq = 44100):
+		sampling_freq = 44100,
+		gcp=False):
 
-		self.mixed_dir = mixed_dir
-		self.processed_dir = processed_dir
+		if gcp = False:        
+			self.mixed_dir = mixed_dir
+			self.processed_dir = processed_dir
+
+		else:
+			self.mixed_dir = "gs://ad-bucket-15730/mixed/"
+			self.processed_dir = "gs://ad-bucket-15730/training_processed/"            
+
 		self.sampling_freq = sampling_freq
 
 	def read(self, filename, normalize=True):

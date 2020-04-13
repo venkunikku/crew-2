@@ -1,13 +1,21 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import os
 import librosa
 import soundfile as sf
+import gcsfs
 
-target = '../../noise_downsampled'
+gcp = False
 
-files = librosa.util.find_files('../../noise', ext='wav')
+if gcp == False:
+    
+    source = '../../noise'
+    target = '../../noise_downsampled'
+    
+else:
+    
+    source = 'gs://ad-bucket-15730/noise'
+    target = 'gs://ad-bucket-15730/noise_downsampled'
+
+files = librosa.util.find_files(source, ext='wav')
 
 for file in files:
     basename = os.path.basename(file)

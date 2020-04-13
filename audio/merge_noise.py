@@ -1,7 +1,14 @@
 import wave
 import os
+import gcsfs
 
-noise_dir = "../../noise/"
+gcp = False
+
+if gcp == False:
+    noise_dir = "../../noise/"
+    
+else:
+    noise_dir = "gs://ad-bucket-15730/noise/"
 
 infiles = os.listdir(noise_dir)
 outfile = noise_dir + "combined-noise.wav"

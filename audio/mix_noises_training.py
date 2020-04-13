@@ -5,13 +5,26 @@ from random import seed
 from random import randint 
 import glob
 import shutil
+import gcsfs
 
 n_iterations = 2
 
-noise_downsampled_dir = '../../noise_downsampled/'
-down_sampled_training_dir = '../../training_downsampled/'
-noise_downsampled_dir = '../../noise_downsampled/'
-target_dir = '../../mixed/'
+gcp = False
+
+if gcp == False:
+    noise_downsampled_dir = '../../noise_downsampled/'
+    down_sampled_training_dir = '../../training_downsampled/'
+    noise_downsampled_dir = '../../noise_downsampled/'
+    target_dir = '../../mixed/'
+    metadata_file = '../../training/UrbanSound8K/metadata/metadata.csv'
+    
+else:
+    noise_downsampled_dir = 'gs://ad-bucket-15730/noise_downsampled/'
+    down_sampled_training_dir = 'gs://ad-bucket-15730/training_downsampled/'
+    noise_downsampled_dir = 'gs://ad-bucket-15730/noise_downsampled/'
+    target_dir = 'gs://ad-bucket-15730/mixed/'
+    metadata_file = 'gs://ad-bucket-15730/training/UrbanSound8K/metadata/metadata.csv'
+    
 
 """
 randomly mixes clean audio files and noise and stores in designated directory
@@ -26,7 +39,7 @@ for f in files:
 for filename in glob.glob(os.path.join(down_sampled_training_dir, '*.*')):
     shutil.copy(filename, target_dir)
 
-mixed_meta_data = pd.read_csv('../../training/UrbanSound8K/metadata/metadata.csv')
+mixed_meta_data = pd.read_csv(metadata_file)
 
 # read in noise files
 noise_chunks = []

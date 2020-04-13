@@ -1,1 +1,1 @@
-gcloud compute ssh $VM_NAME
+gcloud compute ssh --project $PROJECT_ID root@$VM_NAME --zone $ZONE 

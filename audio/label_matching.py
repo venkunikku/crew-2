@@ -1,13 +1,23 @@
 import os
 import pandas as pd
 import librosa 
+import gcsfs
 
+gcp = False
 
-meta_data = pd.read_csv('../../training/UrbanSound8K/metadata/metadata.csv')
+if gcp == False:
+    meta_data = pd.read_csv('../../training/UrbanSound8K/metadata/metadata.csv')
+    folder_name = '../../mixed/'
+    
+else:
+    
+    meta_data = pd.read_csv('gs://ad-bucket-15730/training/UrbanSound8K/metadata/metadata.csv')
+    folder_name = 'gs://ad-bucket-15730/mixed/'
+
 x = []
 sr = []
 audio_class = []
-folder_name = '../../mixed/'
+
 
 for filename in os.listdir(folder_name):
 

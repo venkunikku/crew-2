@@ -1,11 +1,23 @@
 import os
 import librosa
 import soundfile as sf
+import gcsfs
 
 sr = 44100
 audio_class = []
-current_dir = '../../training/UrbanSound8K/audio'
-target_dir = "../../training_downsampled"
+
+gcp = False
+
+if gcp == False:
+
+    current_dir = '../../training/UrbanSound8K/audio'
+    target_dir = "../../training_downsampled"
+    
+else:
+    
+    current_dir = 'gs://ad-bucket-15730/training/UrbanSound8K/audio'
+    target_dir = "gs://ad-bucket-15730/training_downsampled"
+    
 
 for folder in os.listdir(current_dir):
 	

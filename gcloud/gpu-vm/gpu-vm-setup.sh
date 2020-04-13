@@ -10,6 +10,7 @@ pip3 install keras
 pip3 install tensorflow_hub
 pip3 install pomegranate==0.10
 pip3 install cupy
+pip3 install gcsfs
 
 # cloning repo of interest
 git clone https://github.com/venkunikku/crew-2.git

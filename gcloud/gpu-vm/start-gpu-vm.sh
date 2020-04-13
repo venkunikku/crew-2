@@ -7,4 +7,4 @@ gcloud compute instances create $VM_NAME \
 --image-family $IMAGE_VERSION --image-project ubuntu-os-cloud \
 --scopes storage-rw \
 --maintenance-policy TERMINATE --restart-on-failure \
---metadata-from-file startup-script=init.sh
+--metadata-from-file startup-script=vm-init-actions.sh
