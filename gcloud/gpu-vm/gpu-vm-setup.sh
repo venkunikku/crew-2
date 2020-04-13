@@ -16,6 +16,9 @@ pip3 install librosa
 pip3 install soundfile
 pip3 install python_speech_features
 pip3 install pydub
+pip3 install --upgrade google-cloud-storage
+pip3 install wave
+pip3 install hmmlearn
 
 # cloning repo of interest
 git clone https://github.com/venkunikku/crew-2.git

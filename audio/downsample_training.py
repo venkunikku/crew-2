@@ -1,7 +1,8 @@
 import os
 import librosa
 import soundfile as sf
-import gcsfs
+from google.cloud import storage
+
 
 sr = 44100
 audio_class = []
@@ -39,7 +40,7 @@ else:
 	for i in range(len(blobs)):
         
         # ignore .DS_Store files
-		if ".DS_Store" not in str(blobs[i]):
+		if ".DS_Store" not in str(blobs[i].name):
             
 			# extract just file name from str
 			file_name = blobs[i].name.split("/")[-1]   
