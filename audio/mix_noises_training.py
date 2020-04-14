@@ -173,17 +173,18 @@ else:
                 # upload temp file to new blog storage object
                 new_blob.upload_from_filename("tmp/" + new_file_name)
                 # delete temp file
-                os.remove("tmp/" + new_file_name)    
+                os.remove("tmp/" + new_file_name)
+                print("uploaded {} to bucket and removed from tmp".format(new_file_name))
 
                 # update metadata
                 row = mixed_meta_data[mixed_meta_data['slice_file_name'] == file_name]
                 mixed_meta_data = mixed_meta_data.append(row)
-                updated_row = mixed_meta_data.iloc[len(mixed_meta_data)-1].replace({mixed_meta_data.iloc[len(mixed_meta_data)-1,0]:"mixed_%s_%s" % (str(i),new_file_name)})
+                updated_row = mixed_meta_data.iloc[len(mixed_meta_data)-1].replace({mixed_meta_data.iloc[len(mixed_meta_data)-1,0]:"%s" % (new_file_name)})
                 mixed_meta_data.iloc[len(mixed_meta_data)-1] = updated_row
 
                 print("length:",len(mixed_meta_data)-1)
-                newname = "mixed_%s_%s" % (str(i), new_file_name)
-                print("newname:",newname)
+                newname = "%s" % (new_file_name)
+                print("added to metadata; newname:",newname)
             
     
     # write finalized metadata to bucket
