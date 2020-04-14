@@ -1,6 +1,9 @@
+import librosa
+import soundfile as sf
 import wave
 import os
 from google.cloud import storage
+import io
 
 # adjust as needed
 gcp = True
@@ -16,8 +19,8 @@ if gcp == False:
     for infile in infiles:
         
         w = wave.open(noise_dir + infile, 'rb')
-    	combined_data.append([w.getparams(), w.readframes(w.getnframes())])
-    	w.close()
+        combined_data.append([w.getparams(), w.readframes(w.getnframes())])
+        w.close()
 
     output = wave.open(outfile, 'wb')
     output.setparams(combined_data[0][0])
@@ -27,6 +30,7 @@ if gcp == False:
     
 else:
     
+    bucket_name = "ad-bucket-15730"
     noise_dir = "noise"
     outfile = "combined-noise.wav"
     # open storage client
@@ -40,13 +44,15 @@ else:
     for infile in infiles:
         
         # ignore .DS_Store files
-	if ".DS_Store" not in str(infile.name):
+        if ".wav" in str(infile.name):
             
             # download blob as string
-	    file_as_string = infile.download_as_string()
-    	    w = wave.open(io.BytesIO(file_as_string), 'rb')
-    	    combined_data.append([w.getparams(), w.readframes(w.getnframes())])
-    	    w.close()
+            file_as_string = infile.download_as_string()
+            x,sr = sf.read(io.BytesIO(file_as_string))
+            sf.write('tmp/tmp.wav', x, sr)
+            w = wave.open('tmp/tmp.wav', 'r')
+            combined_data.append([w.getparams(), w.readframes(w.getnframes())])
+            w.close()
 
     output = wave.open("tmp/" + outfile, 'wb')
     output.setparams(combined_data[0][0])
@@ -59,9 +65,9 @@ else:
     # assign new file name to blog storage object
     blob = bucket.blob(new_file_name)
     # upload temp file to new blog storage object
-    blob.upload_from_file("tmp/" + outfile)
+    blob.upload_from_filename("tmp/" + outfile)
     # delete temp file
-    os.remove("tmp/" + file_name)
+    os.remove("tmp/" + outfile)
 
 
 
