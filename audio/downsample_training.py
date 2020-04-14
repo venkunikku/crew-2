@@ -3,7 +3,6 @@ import librosa
 import soundfile as sf
 from google.cloud import storage
 
-
 sr = 44100
 audio_class = []
 

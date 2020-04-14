@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import librosa 
-import gcsfs
+from google.cloud import storage
 
 gcp = False
 
