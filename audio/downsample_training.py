@@ -2,11 +2,12 @@ import os
 import librosa
 import soundfile as sf
 from google.cloud import storage
+import io
 
-sr = 44100
+sr = 20000
 audio_class = []
 
-gcp = False
+gcp = True
 
 if gcp == False:
     
@@ -18,11 +19,12 @@ if gcp == False:
         if folder != '.DS_Store':
             
             path = os.path.join(current_dir, folder)
-	    for filename in os.listdir(path):
+            
+            for filename in os.listdir(path):
                 
-                if filename != '.DS_Store':	
+                if filename != '.DS_Store':
                     a,b = librosa.core.load(os.path.join(path, filename),sr=sr, mono=True)
-		    sf.write((target_dir + "/" + filename), a, b, subtype = 'PCM_16')
+                    sf.write((target_dir + "/" + filename), a, b, subtype = 'PCM_16')
     
 else:
     
@@ -37,26 +39,30 @@ else:
     # get list of all audio files
     blobs = list(bucket.list_blobs(prefix=current_dir))
     
+    count = 0
     for i in range(len(blobs)):
+        
         # ignore .DS_Store files
-	if ".DS_Store" not in str(blobs[i].name):
+        if ".wav" in str(blobs[i].name):
             
             # extract just file name from str
-	    file_name = blobs[i].name.split("/")[-1]   
+            file_name = blobs[i].name.split("/")[-1]
             # download blob as string
-	    file_as_string = blobs[i].download_as_string()
+            file_as_string = blobs[i].download_as_string()
             # convert string to bytes and then load to librosa
-	    a,b = librosa.core.load(io.BytesIO(file_as_string),sr=sr, mono=True)
+            a,b = librosa.core.load(io.BytesIO(file_as_string),sr=sr, mono=True)
             # write temporarily to wav file
-	    sf.write(("tmp/" + file_name), a, b, subtype = 'PCM_16')
+            sf.write(("tmp/" + file_name), a, b, subtype = 'PCM_16')
             # create new file path/name
-	    new_file_name = "%s/%s" % (target_dir, file_name)
+            new_file_name = "%s/%s" % (target_dir, file_name)
             # assign new file name to blog storage object
-	    blob = bucket.blob(new_file_name)
+            blob = bucket.blob(new_file_name)
             # upload temp file to new blog storage object
-	    blob.upload_from_file("tmp/" + file_name)
-	    # delete temp file
-	    os.remove("tmp/" + file_name)
+            blob.upload_from_filename("tmp/" + file_name)
+            # delete temp file
+            os.remove("tmp/" + file_name)
+            count += 1
+            print(count, " samples saved to bucket")
             
             
             

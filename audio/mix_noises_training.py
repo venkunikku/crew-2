@@ -6,10 +6,12 @@ from random import randint
 import glob
 import shutil
 from google.cloud import storage
+import io
 
+# number of random mixes you want to make for each original smaple
 n_iterations = 2
 
-gcp = False
+gcp = True
 
 if gcp == False:
     
@@ -96,14 +98,14 @@ else:
     """
 
     # move clean downsampled files over
-    os.system("gsutil cp gs://ad-bucket-15730/training_downsampled/* gs://ad-bucket-15730/mixed")
+    #os.system("gsutil cp gs://ad-bucket-15730/training_downsampled/* gs://ad-bucket-15730/mixed")
 
     # read in original metadata file
-    meta_data = pd.read_csv(metadata_file)
+    mixed_meta_data = pd.read_csv(metadata_file)
     # write original metadata to new directory
-    meta_data.to_csv('gs://ad-bucket-15730/'+target_dir+'/mixed_metadata.csv', index = False)
+    #meta_data.to_csv('tmp/mixed_metadata.csv', index = Fals
     # and read back into pandas
-    mixed_meta_data = pd.read_csv('gs://ad-bucket-15730/'+target_dir+'/mixed_metadata.csv')
+    #mixed_meta_data = pd.read_csv('tmp/mixed_metadata.csv')
 
     # create list of noise file names
     noise_chunks = []
@@ -136,13 +138,13 @@ else:
         for blob in training_blobs:
 
             # ignore .DS_Store files
-            if ".DS_Store" not in str(blob.name):
+            if ".wav" in str(blob.name):
     
                 # get the downsampled training clip
                 # download blob as string
                 file_as_string = blob.download_as_string()
                 # convert to bytes and then load into pydub
-                sound1 = AudioSegment.from_file(io.BytesIO(file_as_string))
+                sound1 = AudioSegment.from_wav(io.BytesIO(file_as_string))
                 # random pick a noise chunk
                 random_int = randint(0, (len(noise_chunks)-1))
                 noise_file = noise_chunks[random_int]
@@ -150,37 +152,41 @@ else:
                 storage_client = storage.Client()
                 # name bucket from storage client
                 bucket = storage_client.get_bucket(bucket_name)
-                # get list of all audio files
+                # get list of all noise files
                 noise_blob = list(bucket.list_blobs(prefix=noise_file))[0]
                 # download blob as string
                 file_as_string = noise_blob.download_as_string()
                 # convert to bytes and then read into pydub
-                sound2 = AudioSegment.from_file(io.BytesIO(file_as_string))
+                sound2 = AudioSegment.from_wav(io.BytesIO(file_as_string))
                 # combine both sound files
                 combined = sound1.overlay(sound2)
                 # generate new file name
-                file_name = "mixed_" + str(i) + "_" + str(blob.name)
+                # extract just file name from str
+                file_name = blob.name.split("/")[-1]
+                new_file_name = "mixed_" + str(i) + "_" + file_name
                 # export resulting wav to tmp dir
-                combined.export("tmp/" + file_name, format="wav")
+                combined.export("tmp/" + new_file_name, format="wav")
                 # create new file path/name
-                new_file_name = "%s/%s" % (target_dir, file_name)
+                new_dir_name = "%s/%s" % (target_dir, new_file_name)
                 # assign new file name to blog storage object
-                new_blob = bucket.blob(new_file_name)
+                new_blob = bucket.blob(new_dir_name)
                 # upload temp file to new blog storage object
-                new_blob.upload_from_file("tmp/" + file_name)
+                new_blob.upload_from_filename("tmp/" + new_file_name)
                 # delete temp file
-                os.remove("tmp/" + file_name)    
+                os.remove("tmp/" + new_file_name)    
 
                 # update metadata
-                row = mixed_meta_data[mixed_meta_data['slice_file_name'] == str(blob.name)]
+                row = mixed_meta_data[mixed_meta_data['slice_file_name'] == file_name]
                 mixed_meta_data = mixed_meta_data.append(row)
-                updated_row = mixed_meta_data.iloc[len(mixed_meta_data)-1].replace({mixed_meta_data.iloc[len(mixed_meta_data)-1,0]:"mixed_%s_%s" % (str(i),filename)})
+                updated_row = mixed_meta_data.iloc[len(mixed_meta_data)-1].replace({mixed_meta_data.iloc[len(mixed_meta_data)-1,0]:"mixed_%s_%s" % (str(i),new_file_name)})
                 mixed_meta_data.iloc[len(mixed_meta_data)-1] = updated_row
 
                 print("length:",len(mixed_meta_data)-1)
-                newname = "mixed_%s_%s" % (str(i), filename)
+                newname = "mixed_%s_%s" % (str(i), new_file_name)
                 print("newname:",newname)
             
-                mixed_meta_data.to_csv('gs://ad-bucket-15730/'+target_dir+'/mixed_metadata.csv', index = False)
+    
+    # write finalized metadata to bucket
+    mixed_meta_data.to_csv('gs://ad-bucket-15730/'+target_dir+'/mixed_metadata.csv', index = False)
     
 

@@ -1,8 +1,10 @@
 from pydub import AudioSegment
 import numpy as np
 from google.cloud import storage
+import io
+import os
 
-gcp = False
+gcp = True
 
 if gcp == False:
     
@@ -27,6 +29,7 @@ if gcp == False:
     
 else:
     
+    bucket_name = "ad-bucket-15730"
     merged_noise_downsampled_file = "noise/combined-noise.wav"
     noise_downsampled_dir = "noise_downsampled"
     # open storage client
@@ -63,7 +66,7 @@ else:
                 # assign new file name to blog storage object
                 blob = bucket.blob(new_file_name)
                 # upload temp file to new blog storage object
-                blob.upload_from_file("tmp/" + file_name)
+                blob.upload_from_filename("tmp/" + file_name)
                 # delete temp file
                 os.remove("tmp/" + file_name)
 
