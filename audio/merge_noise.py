@@ -2,7 +2,8 @@ import wave
 import os
 from google.cloud import storage
 
-gcp = False
+# adjust as needed
+gcp = True
 
 if gcp == False:
     
