@@ -102,7 +102,7 @@ else:
     """
 
     # move clean downsampled files over
-    os.system("gsutil cp gs://ad-bucket-15730/training_downsampled/* gs://ad-bucket-15730/mixed")
+    os.system("gsutil -m cp gs://ad-bucket-15730/training_downsampled/* gs://ad-bucket-15730/mixed_20k")
 
     # read in original metadata file
     mixed_meta_data = pd.read_csv(metadata_file)
