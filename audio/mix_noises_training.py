@@ -13,6 +13,8 @@ n_iterations = 2
 
 gcp = True
 
+sr = 20000
+
 if gcp == False:
     
     noise_downsampled_dir = '../../noise_downsampled/'
@@ -59,12 +61,14 @@ if gcp == False:
                 # get the downsampled training clip
                 file_path1 = os.path.join(down_sampled_training_dir, filename)
                 sound1 = AudioSegment.from_file(file_path1)
-
+                sound1 = sound1.set_frame_rate(sr)
+                                
                 # random pick a noise chunk
                 random_int = randint(0, (len(noise_chunks)-1))
                 noise_file = noise_chunks[random_int]
                 file_path2 = os.path.join(noise_downsampled_dir, noise_file)
                 sound2 = AudioSegment.from_file(file_path2)
+                sound2 = sound2.set_frame_rate(sr)
         
                 # combine both sound files
                 combined = sound1.overlay(sound2)
@@ -90,7 +94,7 @@ else:
     noise_downsampled_dir = 'noise_downsampled'
     down_sampled_training_dir = 'training_downsampled'
     noise_downsampled_dir = 'noise_downsampled'
-    target_dir = 'mixed'
+    target_dir = 'mixed_20k'
     metadata_file = 'gs://ad-bucket-15730/training/UrbanSound8K/metadata/metadata.csv'
 
     """
@@ -98,14 +102,10 @@ else:
     """
 
     # move clean downsampled files over
-    #os.system("gsutil cp gs://ad-bucket-15730/training_downsampled/* gs://ad-bucket-15730/mixed")
+    os.system("gsutil cp gs://ad-bucket-15730/training_downsampled/* gs://ad-bucket-15730/mixed")
 
     # read in original metadata file
     mixed_meta_data = pd.read_csv(metadata_file)
-    # write original metadata to new directory
-    #meta_data.to_csv('tmp/mixed_metadata.csv', index = Fals
-    # and read back into pandas
-    #mixed_meta_data = pd.read_csv('tmp/mixed_metadata.csv')
 
     # create list of noise file names
     noise_chunks = []
@@ -125,13 +125,8 @@ else:
     # depends on the number of times you want to randomly mix each file
     for i in range(n_iterations):
     
-        seed(i)
-
         # for one iteration, mix each file in the training directory
-        # open storage client
-        storage_client = storage.Client()
-        # name bucket from storage client
-        bucket = storage_client.get_bucket(bucket_name)
+        seed(i)
         # get list of all audio files
         training_blobs = list(bucket.list_blobs(prefix=down_sampled_training_dir))
 
@@ -145,19 +140,17 @@ else:
                 file_as_string = blob.download_as_string()
                 # convert to bytes and then load into pydub
                 sound1 = AudioSegment.from_wav(io.BytesIO(file_as_string))
+                sound1 = sound1.set_frame_rate(sr)
                 # random pick a noise chunk
                 random_int = randint(0, (len(noise_chunks)-1))
                 noise_file = noise_chunks[random_int]
-                # open storage client
-                storage_client = storage.Client()
-                # name bucket from storage client
-                bucket = storage_client.get_bucket(bucket_name)
                 # get list of all noise files
                 noise_blob = list(bucket.list_blobs(prefix=noise_file))[0]
                 # download blob as string
                 file_as_string = noise_blob.download_as_string()
                 # convert to bytes and then read into pydub
                 sound2 = AudioSegment.from_wav(io.BytesIO(file_as_string))
+                sound2 = sound2.set_frame_rate(sr)
                 # combine both sound files
                 combined = sound1.overlay(sound2)
                 # generate new file name
@@ -185,8 +178,10 @@ else:
                 print("length:",len(mixed_meta_data)-1)
                 newname = "%s" % (new_file_name)
                 print("added to metadata; newname:",newname)
-            
-    
+        
+        # write metadata to vm for extra copy
+        mixed_meta_data.to_csv('tmp/mixed_metadata.csv', index = False)
+
     # write finalized metadata to bucket
     mixed_meta_data.to_csv('gs://ad-bucket-15730/'+target_dir+'/mixed_metadata.csv', index = False)
     

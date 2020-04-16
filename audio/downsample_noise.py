@@ -42,7 +42,7 @@ else:
             file_name = blobs[i].name.split("/")[-1]   
             # download blob as string
             file_as_string = blobs[i].download_as_string()
-            # convert string to bytes and then load to librosa
+            # convert string to bytes and then load to librosa, resample at target sample rate 'sr'
             a,b = librosa.core.load(io.BytesIO(file_as_string),sr=sr, mono=True)
             # write temporarily to wav file
             sf.write(("tmp/" + file_name), a, b, subtype = 'PCM_16')

@@ -5,6 +5,7 @@ import io
 import os
 
 gcp = True
+sr = 20000
 
 if gcp == False:
     
@@ -12,6 +13,8 @@ if gcp == False:
 
     audio_file = noise_downsampled_dir + "combined-noise.wav"
     audio = AudioSegment.from_wav(audio_file)
+    audio = audio.set_frame_rate(sr)
+
     list_of_timestamps = list(np.arange(4,120,4))  #and so on in *seconds*
 
     start = 0
@@ -46,8 +49,9 @@ else:
 
             # download blob as string
             file_as_string = blobs[i].download_as_string()
-
+            
             audio = AudioSegment.from_wav(io.BytesIO(file_as_string))
+            audio = audio.set_frame_rate(sr)
             list_of_timestamps = list(np.arange(4,120,4))  #and so on in *seconds*
 
             start = 0
