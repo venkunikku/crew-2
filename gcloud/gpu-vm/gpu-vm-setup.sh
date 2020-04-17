@@ -9,7 +9,6 @@ pip3 install tensorflow-gpu
 pip3 install keras
 pip3 install tensorflow_hub
 pip3 install pomegranate==0.10
-pip3 install cupy
 pip3 install gcsfs
 pip3 install jupyter
 pip3 install librosa
@@ -19,6 +18,15 @@ pip3 install pydub
 pip3 install --upgrade google-cloud-storage
 pip3 install wave
 pip3 install hmmlearn
+pip3 install matplotlib
+#cupy setup
+pip3 install cupy --no-cache-dir -vvvv
+pip3 install cython
+# sompy
+pip3 install sompy
+wget https://github.com/sevamoo/SOMPY/archive/master.zip && pip3 install master.zip
+pip3 install ipdb
+pip3 install ipdb==0.8.1
 
 # cloning repo of interest
 git clone https://github.com/venkunikku/crew-2.git
