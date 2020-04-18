@@ -19,6 +19,7 @@ pip3 install --upgrade google-cloud-storage
 pip3 install wave
 pip3 install hmmlearn
 pip3 install matplotlib
+pip3 install tqdm
 #cupy setup
 pip3 install cupy --no-cache-dir -vvvv
 pip3 install cython
