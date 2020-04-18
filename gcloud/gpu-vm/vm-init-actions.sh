@@ -1,3 +1,4 @@
-sudo gsutil cp gs://ad-bucket-15730/gpu-vm-setup.sh ./
+sudo gsutil cp gs://$BUCKET_NAME/gpu-vm-setup.sh ./
 
-sudo gsutil cp gs://ad-bucket-15730/start-jupyter.sh ./
+
+sudo gsutil cp gs://$BUCKET_NAME/start-jupyter.sh ./
