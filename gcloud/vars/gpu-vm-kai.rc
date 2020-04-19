@@ -1,13 +1,13 @@
 ### Set up environmental variables ###
 # Multiple GPUs on Master; N Workers are to be preemptible
 
-export USER=chris
-export PROJECT_NAME=audio-detection
-export PROJECT_ID=audio-detection-1 # project_id needs to be updated here for new project
+export USER=kai
+export PROJECT_NAME=capstone-robotic
+export PROJECT_ID=capstone-robotic # project_id needs to be updated here for new project
 export VM_NAME=ad-vm
 
-export BUCKET_NAME=ad-bucket-15730 # needs to be updated here for new projects
-export BUCKET_SA=ad-bucket-sa
+export BUCKET_NAME=mixed-sounds-file # needs to be updated here for new projects
+export BUCKET_SA=mixed-sounds-file
 
 export ZONE=asia-east1-a
 
