@@ -12,17 +12,17 @@ class feature_extraction():
 		mixed_dir = "../../mixed/",
 		processed_dir = "../../training_processed/",
 		sampling_freq = 44100,
-		gcp=False, 
+		gcs=False, 
 		bucket_name = "ad-bucket-15730"):
 
         
 		self.mixed_dir = mixed_dir
 		self.processed_dir = processed_dir
 		self.sampling_freq = sampling_freq
-		self.gcp = gcp
+		self.gcs = gcs
 		self.bucket_name = bucket_name
 
-		if self.gcp == True:
+		if self.gcs == True:
 
 			# open storage client
 			storage_client = storage.Client()
@@ -34,7 +34,7 @@ class feature_extraction():
 		"""
 		Read in wav file; Excepts just the filename as arg
 		"""
-		if self.gcp == True:
+		if self.gcs == True:
             
 			filepath = self.mixed_dir + "/" + filename
 			blob = list(self.bucket.list_blobs(prefix=filepath))[0]
@@ -44,7 +44,7 @@ class feature_extraction():
 
 		else:
 
-			filepath = self.mixed_dir + filename
+			filepath = self.mixed_dir + "/" + filename
 			sf, time_signal = wavfile.read(filepath, mmap=True)
 
 		if normalize == True:
