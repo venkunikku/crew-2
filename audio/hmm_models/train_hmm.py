@@ -50,22 +50,30 @@ parser.add_argument('--training_prop', action='store', dest='training_prop', typ
 parse_results = parser.parse_args()
 ### name this particular trial ###
 trial_name = parse_results.trial_name
+print("trial_name: ", trial_name)
 ### max number of iterations the E-M algorithm performs during training ### 
 num_iterations = parse_results.num_iterations
+print("num_iterations: ", num_iterations)
 ### number of cepstral coefficients to return from mfcc (13 is typical) ###
 num_cep_coefs = parse_results.num_cep_coefs
+print("num_cep_coefs: ", num_cep_coefs)
 ### whether we will feed concatenated, 2-dimensional cepstral coefficients for each track as a sample ###
 multidimensional_input = parse_results.multidimensional_input
+print("multidimensional_input: ", multidimensional_input)
 ### whether to use the pomegranate package or hmmlearn for fitting hmm ###
 use_pomegranate = parse_results.use_pomegranate
+print("use_pomegranate: ", use_pomegranate)
 ### what distribution to use for the hidden states ###
 distribution = parse_results.distribution
 if distribution == "MultivariateGaussianDistribution":
     distribution = pomegranate.MultivariateGaussianDistribution
+print("distribution: ", distribution)
 ### how many threads should we use to train the model ###
 n_threads = parse_results.n_threads
+print("n_threads: ", n_threads)
 ### training-validation split: 1 if using the set aside validation set ###
 training_prop = parse_results.training_prop
+print("training proportion: ", training_prop)
 
 """
 SPECIFY WHERE WE'RE RUNNING, WE'RE SAMPLES ARE LOCATED
