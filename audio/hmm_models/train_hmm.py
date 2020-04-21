@@ -17,6 +17,7 @@ import pomegranate
 from python_speech_features import mfcc
 from sklearn.externals import joblib
 import hmm_model_feature_extraction
+from model_utils import HMM_Model
 import random
 from tqdm import tqdm
 from ast import literal_eval
@@ -28,6 +29,12 @@ MODEL CONFIGURATIONS
 
 import argparse
 parser = argparse.ArgumentParser(description='train parser')
+parser.add_argument('--gcp', action='store_true', dest='gcp', help='affects whether to configure to running on the cloud')
+parser.add_argument('--local', action='store_false', dest='gcp', help='affects whether to configure to running on the cloud')
+parser.add_argument('--pre_populated_validation_set', action='store_true',dest='pre_populated_validation_set', \
+help='affects whether we use our pre-populated validation set for validation - recommended for cloud')
+parser.add_argument('--random_validation_set', action='store_false',dest='pre_populated_validation_set', \
+help='affects whether we use our pre-populated validation set for validation - recommended for cloud')
 parser.add_argument('--trial_name', action='store', dest='trial_name', help='indicate name of trial')
 parser.add_argument('--num_iterations', action='store', dest='num_iterations', type=int, \
                     help='indicate max number of iterations to train')
@@ -48,6 +55,11 @@ parser.add_argument('--training_prop', action='store', dest='training_prop', typ
                     help='training-validation split: 1 if using the set aside validation set')
 
 parse_results = parser.parse_args()
+
+### SPECIFY WHERE WE'RE RUNNING ###
+gcp = parse_results.gcp
+### WHERE SAMPLES ARE LOCATED ###
+pre_populated_validation_set = parse_results.pre_populated_validation_set
 ### name this particular trial ###
 trial_name = parse_results.trial_name
 print("trial_name: ", trial_name)
@@ -66,7 +78,10 @@ print("use_pomegranate: ", use_pomegranate)
 ### what distribution to use for the hidden states ###
 distribution = parse_results.distribution
 if distribution == "MultivariateGaussianDistribution":
-    distribution = pomegranate.MultivariateGaussianDistribution
+    distribution = pomegranate.distributions.MultivariateGaussianDistribution
+elif distribution == "DirichletDistribution":
+    distribution = pomegranate.distributions.DirichletDistribution
+
 print("distribution: ", distribution)
 ### how many threads should we use to train the model ###
 n_threads = parse_results.n_threads
@@ -74,15 +89,6 @@ print("n_threads: ", n_threads)
 ### training-validation split: 1 if using the set aside validation set ###
 training_prop = parse_results.training_prop
 print("training proportion: ", training_prop)
-
-"""
-SPECIFY WHERE WE'RE RUNNING, WE'RE SAMPLES ARE LOCATED
-"""
-
-# affects whether to configure to running on the cloud
-gcp = True
-# affects whether we use our pre-populated validation set for validation (recommended for cloud)
-pre_populated_validation_set = True
 
 """
 ADDITIONAL CONFIGURATIONS BASED ON COMPUTE LOCATION
@@ -108,7 +114,8 @@ if gcp == True:
     local_validation_dir = "validation_local"
     # initialize gcsfs object
     fs = gcsfs.GCSFileSystem(project = 'audio-detection-1')
-
+    metadata = pd.read_csv(gcs_mixed_dir + "/mixed_metadata.csv")
+	
     # enable gpus for pomegranate
     pomegranate.utils.enable_gpu()
     print("communicating with GPU: ", pomegranate.utils.is_gpu_enabled())
@@ -134,13 +141,16 @@ if gcp == True:
     # if fewer then ten (arbitrary) files, copy all in from gcs    
     if len(os.listdir("mixed_local")) < 10:
         
-        os.system("gsutil -m cp {}/* ./{}".format(gcs_mixed_dir, local_mixed_dir))    
-        
+        os.system("gsutil -m cp {}/* ./{}".format(gcs_mixed_dir, local_mixed_dir))
+
+    
 else:
     
     # configuration when not running on the cloud
     local_mixed_dir = "../../../mixed"
     local_hmm_model_dir = "../../../hmm_models"
+    metadata = pd.read_csv(local_mixed_dir + "/mixed_metadata.csv")
+
 
 
 ### initialize feature extraction class ###
@@ -148,10 +158,6 @@ else:
 # sampling_freq will depend on how we initially processed our audio files
 # gcs will depend on whether we want to pull from gcs during training or from local directory
 fe = hmm_model_feature_extraction.feature_extraction(mixed_dir=local_mixed_dir, sampling_freq = 20000, gcs = False)
-
-### load in mixed_metadata ###
-metadata = pd.read_csv(gcs_mixed_dir + "/mixed_metadata.csv")
-
 
 ### choose hidden states per self-organizing maps
 
@@ -175,115 +181,6 @@ if pre_populated_validation_set == True:
     # retain only the training samples in the metadata df 
     metadata = metadata[~metadata['slice_file_name'].isin(validation_samples_list)]
     
-### Define a class to train the HMM ###
-
-# Parameters of `hmm.GaussianHMM()`:
-# `n_components`: number of states of HMM
-# `covariance_type`: type of covariance matrix for each state. 
-# Each state is a random vector. 
-# This parameter is a string defining the type of covariance matrix of this vector. Defaults to `"diagonal"`
-
-class HMM_Model(object):
-    
-    def __init__(self, num_components=12, 
-                 num_iter=100,
-                use_pomegranate=True,
-                distribution=pomegranate.NormalDistribution,
-                gpu=False):
-        
-        self.n_components = num_components
-        self.n_iter = num_iter
-        self.use_pomegranate = use_pomegranate
-        self.distribution = distribution
-        
-        # define the covariance type and the type of HMM:
-        self.cov_type = 'diag'
-        self.model_name = 'GaussianHMM'
-        
-        # initialize the variable in which we will store the models for each word:
-        self.models = []
-        
-        # define the model using the specified parameters:
-        if not self.use_pomegranate:
-
-            self.model = hmm.GaussianHMM(n_components=self.n_components,
-                                     covariance_type=self.cov_type,
-                                     n_iter=self.n_iter, verbose=True)
-        
-        # we anble pomegranate's gpu utility if gpu is set to true 
-        self.gpu = gpu
-        if self.gpu==True:
-            
-            pomegranate.utils.enable_gpu()
-            print("pomegranate_gpu is enabled: ", pomegranate.utils.is_gpu_enabled())
-            
-        else:
-            
-            pomegranate.utils.disable_gpu()
-            print("pomegranate_gpu is enabled: ", pomegranate.utils.is_gpu_enabled())
-            
-
-    def train(self, training_data, multidimensional_input, n_threads):
-        
-        """
-        Defines a method to train the model
-        'training_data' is a 2D numpy array where each row has the 
-        length of number of mfcc coefficients
-        """
-        # for default case using pomegranate package        
-        if self.use_pomegranate:
-            
-            # training on multidimensional input (i.e. n_samples x n_windows x n_cepstral_coefs)
-            if multidimensional_input:
-                
-                print("training on multidimensional input using pomegranate, {} states, {} iterations, sample shape {}, and {} threads".format(self.n_components,self.n_iter,training_data.shape, n_threads))
-                self.model = pomegranate.HiddenMarkovModel.from_samples(self.distribution, 
-                                                                    self.n_components,
-                                                                    training_data, 
-                                                                    max_iterations=self.n_iter,
-                                                                    stop_threshold = 1e-3,
-                                                                    algorithm="baum-welch", 
-                                                                    n_jobs=n_threads, 
-                                                                    verbose=True)
-            
-            # training on unidimensional input (i.e. one cepstral grid per track)
-            else:
-                
-                print("training on unidimensional input using pomegranate, {} states, {} iterations, sample shape {}, and {} threads".format(self.n_components,self.n_iter,training_data.shape, n_threads))
-                self.model = pomegranate.HiddenMarkovModel.from_samples(self.distribution, 
-                                                                    self.n_components,
-                                                                    training_data, 
-                                                                    max_iterations=self.n_iter, 
-                                                                    stop_threshold = 1e-3,    
-                                                                    algorithm="baum-welch", 
-                                                                    n_jobs=n_threads, 
-                                                                    verbose=True)
-                
-                
-            self.models.append(self.model)
-        
-        # for alternative case using hmmlearn
-        else:
-            
-            print("training on unidimensional input using pomegranate, {} states, {} iterations, and sample shape {}".format(self.n_components,self.n_iter,training_data.shape))
-            np.seterr(all='ignore')
-            cur_model = self.model.fit(training_data)
-            self.models.append(cur_model)
-
-    
-    def compute_score(self, input_data):
-        
-        """
-        Define a method to compute log likelihood score for input features
-        Returns: Log likelihood of sample input_data
-        """
-        if self.use_pomegranate:
-            print("scoring input of shape ", input_data.shape, " using pomegranate")
-            return self.model.log_probability(input_data)
-            
-        else:
-            print("scoring input of shape ", input_data.shape, " hmmlearn")
-            return self.model.score(input_data)
         
 ### Trains a single HMM ###
         
@@ -410,7 +307,8 @@ def build_all_models(label_name, metadata, num_states, num_iterations, training_
                 
                 pass
         
-        # (n_samples x n_windows x n_cepstral_coefs)
+        
+		# (n_samples x n_windows x n_cepstral_coefs
         X = X.reshape(counter, 399, num_cep_coefs) # this number likely not robust to other sampling rates
         model = build_one_model(X, num_states, num_iterations, multidimensional_input, \
                                 use_pomegranate, distribution, gpu, n_threads)
@@ -479,7 +377,7 @@ SAVING VALIDATION SAMPLE LIST FOR SUBSEQUENT VALIDATION
         
 if gcp == False:
     
-    with open(hmm_model_dir + '/validation_samples_{}.txt'.format(trial_name),'w') as file:
+    with open(local_hmm_model_dir + '/validation_samples_{}.txt'.format(trial_name),'w') as file:
     
         for ele in validation_samples:
         
@@ -507,13 +405,13 @@ SAVE MODEL
 
 if gcp == True:
 
-    with fs.open('ad-bucket-15730/hmm_models/model_{}.pkl'.format(trial_name), 'wb') as file:
+    with fs.open(gcs_hmm_model_dir + '/model_{}.pkl'.format(trial_name), 'wb') as file:
         
         pickle.dump(models, file)
         
 else:
     
-    joblib.dump(models,hmm_model_dir+'/model_{}.pkl'.format(trial_name))
+    joblib.dump(models, local_hmm_model_dir +'/model_{}.pkl'.format(trial_name))
     
 
 
