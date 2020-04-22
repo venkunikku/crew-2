@@ -1,4 +1,4 @@
-sudo gsutil cp gs://$BUCKET_NAME/gpu-vm-setup.sh ./
+sudo gsutil cp gs://mixed-sounds-file/gpu-vm-setup.sh ./
 
 
-sudo gsutil cp gs://$BUCKET_NAME/start-jupyter.sh ./
+sudo gsutil cp gs://mixed-sounds-file/start-jupyter.sh ./

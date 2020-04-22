@@ -52,7 +52,7 @@ class HMM_Model(object):
             print("pomegranate_gpu is enabled: ", pomegranate.utils.is_gpu_enabled())
             
 
-    def train(self, training_data, multidimensional_input, n_threads):
+    def train(self, training_data, multidimensional_input, n_threads, batches_per_epoch, lr_decay):
         
         """
         Defines a method to train the model
@@ -71,7 +71,9 @@ class HMM_Model(object):
                                                                     training_data, 
                                                                     max_iterations=self.n_iter,
                                                                     stop_threshold = 1e-3,
-                                                                    algorithm="baum-welch", 
+                                                                    algorithm="baum-welch",
+                                                                    batches_per_epoch=batches_per_epoch,
+                                                                    lr_decay=lr_decay,
                                                                     n_jobs=n_threads, 
                                                                     verbose=True)
             
@@ -84,7 +86,9 @@ class HMM_Model(object):
                                                                     training_data, 
                                                                     max_iterations=self.n_iter, 
                                                                     stop_threshold = 1e-3,    
-                                                                    algorithm="baum-welch", 
+                                                                    algorithm="baum-welch",
+                                                                    batches_per_epoch=batches_per_epoch,
+                                                                    lr_decay=lr_decay,
                                                                     n_jobs=n_threads, 
                                                                     verbose=True)
                 

@@ -7,11 +7,20 @@ import glob
 import shutil
 from google.cloud import storage
 import io
+import tqdm
+
+import argparse
+parser = argparse.ArgumentParser(description='train parser')
+parser.add_argument('--gcp', action='store_true', dest='gcp', help='affects whether to configure to running on the cloud')
+parser.add_argument('--local', action='store_false', dest='gcp', help='affects whether to configure to running on the cloud')
+
+parse_results = parser.parse_args()
+
+### SPECIFY WHERE WE'RE RUNNING ###
+gcp = parse_results.gcp
 
 # number of random mixes you want to make for each original smaple
 n_iterations = 2
-
-gcp = True
 
 sr = 20000
 
@@ -54,12 +63,12 @@ if gcp == False:
         seed(i)
 
         # for one iteration, fix each file in the training directory
-        for filename in os.listdir(down_sampled_training_dir):
+        for j in range(len(os.listdir(down_sampled_training_dir))):
 
-            if filename != ".DS_Store":
+            if os.listdir(down_sampled_training_dir)[j] != ".DS_Store":
     
                 # get the downsampled training clip
-                file_path1 = os.path.join(down_sampled_training_dir, filename)
+                file_path1 = os.path.join(down_sampled_training_dir, os.listdir(down_sampled_training_dir)[j])
                 sound1 = AudioSegment.from_file(file_path1)
                 sound1 = sound1.set_frame_rate(sr)
                                 
@@ -74,16 +83,16 @@ if gcp == False:
                 combined = sound1.overlay(sound2)
         
                 # export resulting wav to target dir
-                combined.export(target_dir + "mixed_" + str(i) + "_" + filename, format="wav")
+                combined.export(target_dir + "mixed_" + str(i) + "_" + os.listdir(down_sampled_training_dir)[j], format="wav")
 
                 # update metadata
-                row = mixed_meta_data[mixed_meta_data['slice_file_name'] == filename]
+                row = mixed_meta_data[mixed_meta_data['slice_file_name'] == os.listdir(down_sampled_training_dir)[j]]
                 mixed_meta_data = mixed_meta_data.append(row)
-                updated_row = mixed_meta_data.iloc[len(mixed_meta_data)-1].replace({mixed_meta_data.iloc[len(mixed_meta_data)-1,0]:"mixed_%s_%s" % (str(i),filename)})
+                updated_row = mixed_meta_data.iloc[len(mixed_meta_data)-1].replace({mixed_meta_data.iloc[len(mixed_meta_data)-1,0]:"mixed_%s_%s" % (str(i),os.listdir(down_sampled_training_dir)[j])})
                 mixed_meta_data.iloc[len(mixed_meta_data)-1] = updated_row
 
                 print("length:",len(mixed_meta_data)-1)
-                newname = "mixed_%s_%s" % (str(i), filename)
+                newname = "mixed_%s_%s" % (str(i), os.listdir(down_sampled_training_dir)[j])
                 print("newname:",newname)
             
                 mixed_meta_data.to_csv(target_dir+'mixed_metadata.csv', index = False)

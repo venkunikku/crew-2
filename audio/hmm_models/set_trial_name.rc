@@ -1,2 +1,2 @@
-export TRIAL_NAME=asdflocal_20kHz_13CC_multi-dim_multi-state_250-iter_2-thread
+export TRIAL_NAME=local_20kHz_13CC_unidim_multistate_200_iter_2_thread
 

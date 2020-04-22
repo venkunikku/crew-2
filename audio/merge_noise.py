@@ -5,8 +5,15 @@ import os
 from google.cloud import storage
 import io
 
-# adjust as needed
-gcp = True
+import argparse
+parser = argparse.ArgumentParser(description='train parser')
+parser.add_argument('--gcp', action='store_true', dest='gcp', help='affects whether to configure to running on the cloud')
+parser.add_argument('--local', action='store_false', dest='gcp', help='affects whether to configure to running on the cloud')
+
+parse_results = parser.parse_args()
+
+### SPECIFY WHERE WE'RE RUNNING ###
+gcp = parse_results.gcp
 
 if gcp == False:
     
@@ -17,10 +24,16 @@ if gcp == False:
 
     combined_data = []
     for infile in infiles:
-        
-        w = wave.open(noise_dir + infile, 'rb')
-        combined_data.append([w.getparams(), w.readframes(w.getnframes())])
-        w.close()
+
+        # ignore .DS_Store files
+        if ".wav" in infile:
+
+            print(infile)
+            x,sr = sf.read(noise_dir + infile)
+            sf.write('tmp/tmp.wav', x, sr)
+            w = wave.open('tmp/tmp.wav', 'r')
+            combined_data.append([w.getparams(), w.readframes(w.getnframes())])
+            w.close()
 
     output = wave.open(outfile, 'wb')
     output.setparams(combined_data[0][0])

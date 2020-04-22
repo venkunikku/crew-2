@@ -4,10 +4,19 @@ import soundfile as sf
 from google.cloud import storage
 import io
 
-sr = 20000
-audio_class = []
+import argparse
+parser = argparse.ArgumentParser(description='train parser')
+parser.add_argument('--gcp', action='store_true', dest='gcp', help='affects whether to configure to running on the cloud')
+parser.add_argument('--local', action='store_false', dest='gcp', help='affects whether to configure to running on the cloud')
 
-gcp = True
+parse_results = parser.parse_args()
+
+### SPECIFY WHERE WE'RE RUNNING ###
+gcp = parse_results.gcp
+
+sr = 20000
+
+audio_class = []
 
 if gcp == False:
     

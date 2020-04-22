@@ -62,7 +62,19 @@ sudo apt-get install -y --no-install-recommends libnvinfer6=6.0.1-1+cuda10.1 \
     libnvinfer-dev=6.0.1-1+cuda10.1 \
     libnvinfer-plugin6=6.0.1-1+cuda10.1                                       
 
-# changing ownership for write access to repo
+# Enable Stackdriver
+# Add the agent's package repository
+curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+sudo bash add-monitoring-agent-repo.sh
+sudo apt-get update
+# List the available versions of the agent in order to select which version to install
+sudo apt-cache madison stackdriver-agent
+# To install the latest version of the agent, run
+sudo apt-get install stackdriver-agent
+# Start the agent service
+sudo service stackdriver-agent start
+
+# Changing ownership for write access to repo
 sudo chown -R chrisolen:chrisolen /crew-2
 
 # initializing gh account

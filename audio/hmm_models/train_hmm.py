@@ -81,7 +81,8 @@ if distribution == "MultivariateGaussianDistribution":
     distribution = pomegranate.distributions.MultivariateGaussianDistribution
 elif distribution == "DirichletDistribution":
     distribution = pomegranate.distributions.DirichletDistribution
-
+elif distribution == "NormalDistribution":
+    distribution = pomegranate.distributions.NormalDistribution
 print("distribution: ", distribution)
 ### how many threads should we use to train the model ###
 n_threads = parse_results.n_threads
@@ -185,7 +186,7 @@ if pre_populated_validation_set == True:
 ### Trains a single HMM ###
         
 def build_one_model(features_vector, num_states, num_iterations, multidimensional_input, \
-                    use_pomegranate, distribution, gpu, n_threads):
+                    use_pomegranate, distribution, gpu, n_threads, batches_per_epoch, lr_decay):
     
     """
     features_vector: nparray of features from Class above
@@ -201,7 +202,7 @@ def build_one_model(features_vector, num_states, num_iterations, multidimensiona
     # train HMM model, calculate likelihood of the sample by the trained model
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore',category=DeprecationWarning)
-        model.train(features_vector, multidimensional_input, n_threads)
+        model.train(features_vector, multidimensional_input, n_threads, batches_per_epoch, lr_decay)
         model_score = model.compute_score(features_vector)
         
     return model, model_score
@@ -217,9 +218,10 @@ def hmm_aic(LLik, n, k):
 
 ### Pre-training procedures ###
 
-def build_all_models(label_name, metadata, num_states, num_iterations, training_prop = 0.7, \
+def build_all_models(label_name, metadata, num_states, num_iterations, training_prop=0.7, \
                      multidimensional_input=False, use_pomegranate=True, \
-                     distribution = pomegranate.NormalDistribution, gpu=False, n_threads = 2):
+                     distribution = pomegranate.NormalDistribution, gpu=False, n_threads=2,
+                     batches_per_epoch=50, lr_decay=0.01):
     
     """
     Given an input data folder with subfolders for each response label
@@ -264,7 +266,7 @@ def build_all_models(label_name, metadata, num_states, num_iterations, training_
                 X = np.append(X, mfcc_features, axis=0)
             
         model = build_one_model(X, num_states, num_iterations, multidimensional_input, \
-                                use_pomegranate, distribution, gpu, n_threads)
+                                use_pomegranate, distribution, gpu, n_threads, batches_per_epoch, lr_decay)
         
         # add the model to the results list
         model_results.append((model, label_name))
@@ -311,7 +313,7 @@ def build_all_models(label_name, metadata, num_states, num_iterations, training_
 		# (n_samples x n_windows x n_cepstral_coefs
         X = X.reshape(counter, 399, num_cep_coefs) # this number likely not robust to other sampling rates
         model = build_one_model(X, num_states, num_iterations, multidimensional_input, \
-                                use_pomegranate, distribution, gpu, n_threads)
+                                use_pomegranate, distribution, gpu, n_threads, batches_per_epoch, lr_decay)
         
         # add the model to the results list
         model_results.append((model, label_name))
@@ -346,7 +348,8 @@ for i in range(len(label_states.index)):
                                                      multidimensional_input = multidimensional_input, \
                                                      use_pomegranate = use_pomegranate, \
                                                      distribution = distribution, \
-                                                    gpu=False, n_threads = n_threads)
+                                                    gpu=False, n_threads = n_threads,
+                                                    batches_per_epoch=10000, lr_decay=0.01)
     models.append(model_results)
     validation_sample.append(validation_set)
 
