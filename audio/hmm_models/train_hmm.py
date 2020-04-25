@@ -21,6 +21,7 @@ from model_utils import HMM_Model
 import random
 from tqdm import tqdm
 from ast import literal_eval
+import collections
 from google.cloud import storage
 
 """
@@ -53,6 +54,10 @@ parser.add_argument('--n_threads', action='store', dest='n_threads', type=int,\
                     help='indicate how many threads should we use to train the model')
 parser.add_argument('--training_prop', action='store', dest='training_prop', type=float, \
                     help='training-validation split: 1 if using the set aside validation set')
+parser.add_argument('--batches_per_epoch', action='store', dest='batches_per_epoch', type=int, \
+                    help='number of training batches for each iteration of the E-M algo')
+parser.add_argument('--lr_decay', action='store', dest='lr_decay', type=float, \
+                    help='extent to which lr decays per E-M iteration')
 
 parse_results = parser.parse_args()
 
@@ -90,6 +95,11 @@ print("n_threads: ", n_threads)
 ### training-validation split: 1 if using the set aside validation set ###
 training_prop = parse_results.training_prop
 print("training proportion: ", training_prop)
+batches_per_epoch = parse_results.batches_per_epoch
+print("batches_per_epoch: ", batches_per_epoch)
+lr_decay = parse_results.lr_decay
+print("lr_decay: ", lr_decay)
+
 
 """
 ADDITIONAL CONFIGURATIONS BASED ON COMPUTE LOCATION
@@ -166,6 +176,7 @@ label_states = pd.Series({"air_conditioner":20, "car_horn":18, "children_playing
              "dog_bark":17, "drilling":20, "engine_idling":20,
              "gun_shot":9, "jackhammer":18, "siren":17,
              "street_music":17})
+
 
 """
 VALIDATION SET CONFIGURATIONS if pre_populated_validation_set == True
@@ -278,31 +289,43 @@ def build_all_models(label_name, metadata, num_states, num_iterations, training_
     
     # for multidimensional inputs
     else:
-        
-        # create an empty array for appending features
-        X = np.array([])
     
         print("loading in files for label: ", label_name)
-        
-        # need to count the number of samples not discarded
-        counter = 0
+
+        tracks_as_mfccs = []
         for j in tqdm(range(len(train))):
         
             loaded = fe.read(train[j])
             # nfft assumes 44100Hz
             mfcc_features = fe.return_mfcc(loaded, nfft=1200)
-            
+            tracks_as_mfccs.append(mfcc_features)
+
+        n_windows = [tracks_as_mfccs[i].shape[0] for i in range(len(tracks_as_mfccs))]
+        freq_counts = collections.Counter(n_windows)
+        print(freq_counts)
+        most_freq = freq_counts.most_common(1)[0][0]
+        print("most frequent window length: ", most_freq)
+        
+        print("adding mfcc_features of most_freq window length to training matrix")
+        # create an empty array for appending features
+        X = np.array([])
+
+        # need to count the number of samples not discarded
+        counter = 0
+
+        for k in tqdm(range(len(tracks_as_mfccs))):
+
             # need to have all mfcc features the same 
-            if mfcc_features.shape[0] == 399: # this number likely not robust to other sampling rates
+            if tracks_as_mfccs[k].shape[0] == most_freq: # this number likely not robust to other sampling rates
 
                 if len(X) == 0:
                 
-                    X = mfcc_features
+                    X = tracks_as_mfccs[k]
                     counter += 1
             
                 else:
                 
-                    X = np.append(X, mfcc_features, axis=0)
+                    X = np.append(X, tracks_as_mfccs[k], axis=0)
                     counter += 1
                     
             else:
@@ -311,7 +334,7 @@ def build_all_models(label_name, metadata, num_states, num_iterations, training_
         
         
 		# (n_samples x n_windows x n_cepstral_coefs
-        X = X.reshape(counter, 399, num_cep_coefs) # this number likely not robust to other sampling rates
+        X = X.reshape(counter, most_freq, num_cep_coefs) # this number likely not robust to other sampling rates
         model = build_one_model(X, num_states, num_iterations, multidimensional_input, \
                                 use_pomegranate, distribution, gpu, n_threads, batches_per_epoch, lr_decay)
         
@@ -348,8 +371,8 @@ for i in range(len(label_states.index)):
                                                      multidimensional_input = multidimensional_input, \
                                                      use_pomegranate = use_pomegranate, \
                                                      distribution = distribution, \
-                                                    gpu=False, n_threads = n_threads,
-                                                    batches_per_epoch=10000, lr_decay=0.01)
+                                                    gpu=False, n_threads = n_threads, \
+                                                    batches_per_epoch=batches_per_epoch, lr_decay=lr_decay)
     models.append(model_results)
     validation_sample.append(validation_set)
 

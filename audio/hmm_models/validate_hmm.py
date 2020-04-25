@@ -121,35 +121,79 @@ label_states = pd.Series({"air_conditioner":20, "car_horn":18, "children_playing
              "gun_shot":9, "jackhammer":18, "siren":17,
              "street_music":17})
 
+
+def sum_log_probs(model, features):
+    
+    """
+    Sum the log probabilities of all of the
+    individual mfcc windows for each track - 
+    Used when scoring from univariate distribution
+    HMMs
+    """
+    
+    probs = []
+    
+    for i in range(features.shape[0]):
+
+        score = model.compute_score(features[i,:])
+        probs.append(score)
+
+    s = sum(probs)
+    return s
+
+
 """
 DEFINE SCORING FUNCTION
 """
 
-def score_one_sample(trained_models, test_file_name):
+def score_one_sample(trained_models, test_file_name, multivariate=True):
     
     """
     trained_model: ModelHMM object with trained model
     test_file_path: path to wav file
     """
-    # empty list to hold all of the scores
-    scores = []
+    if multivariate==True:
     
-    # load in file from validation set and convert to mfcc features
-    loaded = fe.read(test_file_name)
-    mfcc_features = fe.return_mfcc(loaded, nfft=1200)
+        # empty list to hold all of the scores
+        scores = []
     
-    # iterate through each of the trained models
-    for i in trained_models:
+        # load in file from validation set and convert to mfcc features
+        loaded = fe.read(test_file_name)
+        mfcc_features = fe.return_mfcc(loaded, nfft=1200)
+    
+        # iterate through each of the trained models
+        for i in trained_models:
         
-        # compute log likelihood score for using each of the trained models
-        sample_score = i[0][0][0].compute_score(mfcc_features)
-        scores.append(sample_score)
+            # compute log likelihood score for using each of the trained models
+            sample_score = i[0][0][0].compute_score(mfcc_features)
+            scores.append(sample_score)
         
-    predicted = scores.index(max(scores))
-    print("max score is:", max(scores), "at index:", predicted)
-    predicted = trained_models[predicted][0][1]
+        predicted = scores.index(max(scores))
+        print("max score is:", max(scores), "at index:", predicted)
+        predicted = trained_models[predicted][0][1]
    
-    return predicted
+        return predicted
+
+    else:
+
+        scores = []
+    
+        # load in file from validation set and convert to mfcc features
+        loaded = fe.read(test_file_name)
+        mfcc_features = fe.return_mfcc(loaded, nfft=1200)
+    
+        # iterate through each of the trained models
+        for i in trained_models:
+        
+            # compute log likelihood score for using each of the trained models
+            sample_score = sum_log_probs(i[0][0][0], mfcc_features)
+            scores.append(sample_score)
+        
+        predicted = scores.index(max(scores))
+        print("max score is:", max(scores), "at index:", predicted)
+        predicted = trained_models[predicted][0][1]
+   
+        return predicted
 
 """
 LOAD MODEL FROM PKL
@@ -182,6 +226,11 @@ else:
     f.close()
     validation_samples = [literal_eval(validation_samples[i]) for i in range(len(validation_samples))]  
 
+val_prop = 0.25
+num_to_val = int(np.ceil(len(validation_samples) * val_prop))
+validation_samples = random.sample(validation_samples, num_to_val)
+print("length of validation sample: ", len(validation_samples))
+
 """
 ITERATE THROUGH VALIDATION SAMPLE USING VALIDATION FUNCTION
 """
@@ -194,7 +243,7 @@ for i in tqdm(range(len(validation_samples))):
     print("validation sample size: ", len(validation_samples))
     actual = validation_samples[i][1]
     print("actual: ", actual)
-    predicted = score_one_sample(trained_models, validation_samples[i][0])
+    predicted = score_one_sample(trained_models, validation_samples[i][0], multivariate=False)
     print("predicted:", predicted)
     validation_list.append((actual,predicted))
     if actual == predicted:

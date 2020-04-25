@@ -17,7 +17,7 @@ class HMM_Model(object):
     def __init__(self, num_components=12, 
                  num_iter=100,
                 use_pomegranate=True,
-                distribution=pomegranate.NormalDistribution,
+                distribution=pomegranate.distributions.NormalDistribution,
                 gpu=False):
         
         self.n_components = num_components
@@ -111,7 +111,7 @@ class HMM_Model(object):
         Returns: Log likelihood of sample input_data
         """
         if self.use_pomegranate:
-            print("scoring input of shape ", input_data.shape, " using pomegranate")
+            #print("scoring input of shape ", input_data.shape, " using pomegranate")
             return self.model.log_probability(input_data)
             
         else:

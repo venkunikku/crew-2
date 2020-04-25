@@ -1,2 +1,3 @@
-export TRIAL_NAME=local_20kHz_13CC_unidim_multistate_200_iter_2_thread
+export TRIAL_NAME=TEST
+#local_20kHz_13CC_unidim_multistate_200_iter_5_thread
 
