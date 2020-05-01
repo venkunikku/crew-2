@@ -115,8 +115,29 @@ class HMM_Model(object):
             return self.model.log_probability(input_data)
             
         else:
+            
             print("scoring input of shape ", input_data.shape, " hmmlearn")
             return self.model.score(input_data)
+
+    def viterbi(self, input_data):
+
+        """
+        Returns log probability of most likely state sequence per viterbi algorith
+        """
+        
+        if self.use_pomegranate:
+
+            return self.model.viterbi(input_data)
+
+        else:
+
+            return self.model.decode(input_data, algorithm='viterbi')
+
+
+
+
+
+
 
 
 
