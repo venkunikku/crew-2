@@ -110,13 +110,16 @@ class HMM_Model(object):
         Define a method to compute log likelihood score for input features
         Returns: Log likelihood of sample input_data
         """
-        if self.use_pomegranate:
-            #print("scoring input of shape ", input_data.shape, " using pomegranate")
+        if 'use_pomegranate' in self.__dict__.keys():
+            
+            print("scoring input of shape ", input_data.shape, "pomegranate")
+
             return self.model.log_probability(input_data)
             
         else:
             
             print("scoring input of shape ", input_data.shape, " hmmlearn")
+            
             return self.model.score(input_data)
 
     def viterbi(self, input_data):
@@ -125,11 +128,15 @@ class HMM_Model(object):
         Returns log probability of most likely state sequence per viterbi algorith
         """
         
-        if self.use_pomegranate:
+        if 'use_pomegranate' in self.__dict__.keys():
+
+            print("using pomegranate")
 
             return self.model.viterbi(input_data)
 
         else:
+
+            print("using hmm_learn")
 
             return self.model.decode(input_data, algorithm='viterbi')
 
