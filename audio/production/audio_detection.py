@@ -8,20 +8,12 @@ start_time = time.time()
 import numpy as np
 import os
 
-import librosa
 import pyaudio
-import noisereduce as nr
-
-from keras.models import model_from_json
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.externals import joblib
 
-import IPython
-
-import hmm_model_feature_extraction
-from hmm_models.model_utils import HMM_Model
-from hmm_models.hmm_inference import hmm_inference
+from hmm_models import hmm_inference
 
 # define mic sampling rate
 sampling_rate = 44100
