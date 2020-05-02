@@ -13,6 +13,8 @@ import pyaudio
 from sklearn.preprocessing import LabelEncoder
 from sklearn.externals import joblib
 
+import scipy.io.wavfile as wavfile
+
 import hmm_inference
 
 # define mic sampling rate
@@ -47,15 +49,44 @@ while(True):
     # read chunk and load it into numpy array
     data = stream.read(chunk_size)
     current_window = np.frombuffer(data, dtype=np.float32)
-    print("current_window shape: ", current_window.shape)
+    
+    # calculate mean signal power
+    freq_signal = np.fft.fft(current_window)
+    len_signal = len(current_window)
+    len_half = np.ceil((len_signal + 1) / 2.0).astype(np.int) 
+    freq_signal = abs(freq_signal[0:len_half]) / len_signal
+    freq_signal **= 2  
+    len_fts = len(freq_signal)
 
-    # make prediction based on current_window
-    prediction_index = hmm_inference.hmm_inference(production_models, current_window) 
-    prediction = list(lb.inverse_transform([prediction_index]))[0]
-    print("predicting ", prediction, " at time ", str(read_time-start_time))
+    if len_signal % 2:
+        freq_signal[1:len_fts] *= 2
+    else:
+        freq_signal[1:len_fts-1] *= 2
+    
+    signal_power = 10 * np.log10(freq_signal)
+    # remov any nans and infs
+    signal_power = signal_power[~np.isnan(signal_power)]
+    signal_power = signal_power[~np.isinf(signal_power)]
 
-    # write prediction
-    #logs =  open ("logs/audio_logx.txt","a")
-    #logs.write("predicting {} at time {}".format(prediction, str(read_time-start_time))
-    #logs.close()
+    mean_signal_power = np.mean(signal_power)
+    
+    print(mean_signal_power)
+    
+    if mean_signal_power > -50:
+
+        # make prediction based on current_window
+        prediction_index = hmm_inference.hmm_inference(production_models, current_window) 
+        prediction = list(lb.inverse_transform([prediction_index]))[0]
+        print("predicting ", prediction, " at time ", str(read_time-start_time))
+        
+        # write to log
+        with open("logs/audio_logs.txt",'a') as logs:
+            logs.write("prediction: {} at time: {}".format(prediction, str(read_time-start_time)))
+
+    # just to be explicit:
+    else:
+        
+        print("within quiet range")
+        pass
+
 
