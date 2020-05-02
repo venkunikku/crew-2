@@ -24,10 +24,9 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
     
 
-def extract_feature(file_name):
+def extract_feature(X, sample_rate):
     #extract all required feaures from a sound wave and stack them into a one row array
-    X, sample_rate = librosa.load(file_name)
-    #print(X)
+    #X, sample_rate = librosa.load(file_name)
     stft = np.abs(librosa.stft(X))
     mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0)
     chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
@@ -43,7 +42,7 @@ def extract_feature(file_name):
 
 def NN_predict(audio_input, model, sample_rate, scaler):
     # Extract features by using extract_feature function
-    test_x = extract_feature(audio_input)
+    test_x = extract_feature(audio_input, sample_rate)
     test_x = test_x.reshape((1,193))
     
     # Use standardScaler to transform data
@@ -51,6 +50,7 @@ def NN_predict(audio_input, model, sample_rate, scaler):
     
     predict_y = model.predict(test_x)
     print(predict_y)
+    
     # Show the predicted class
     pred_y = np.where(predict_y == np.max(predict_y))[1][0]
     #print(pred_y)
@@ -85,7 +85,7 @@ total_samples = sampling_rate * record_seconds
 # initialize portaudio
 p = pyaudio.PyAudio()
 
-py_format = pyaudio.paInt16
+audio_format = pyaudio.paFloat32
 
 # for NN inference
 #hmm = True
@@ -105,7 +105,7 @@ if NN == True:
     ### STREAMING ###
     
     # start the stream
-    stream = p.open(format=py_format, channels=1, rate=sampling_rate, 
+    stream = p.open(format=audio_format, channels=1, rate=sampling_rate, 
                     input=True, frames_per_buffer=chunk_size,
                     output = True, input_device_index = 2)
     
@@ -122,28 +122,25 @@ if NN == True:
         if time.time() - read_time >= 4:
             #total_samples  >= len(current_window) and 
             # read chunk and load it into numpy array
-            data = stream.read(total_samples)
-            current_window = np.fromstring(data, dtype=np.int16)
             
-            waveFile = wave.open('test_audio.wav', 'wb')
-            waveFile.setnchannels(1)
-            waveFile.setsampwidth(2)
-            waveFile.setframerate(sampling_rate)
-            waveFile.writeframes(b''.join(current_window))
-            waveFile.close()
-
-            file_name = 'test_audio.wav'
-
             print('start to predicting')
+            data = stream.read(total_samples)
+            current_window = np.fromstring(data, dtype=np.float32)
+            #current_window = np.float(current_window)
+            
             NN_predict(model = production_models,
-                        audio_input = file_name,
+                        audio_input = current_window,
                         sample_rate = sampling_rate,
                         scaler = sc)
 
-            end_time = time.time()
-            print('Predicting_duration" ', end_time - read_time)
-            break
+            # make prediction based on current_window 
             
+            
+            
+            end_time = time.time()
+            print('Time from hearing sound to finish prediction" ', end_time - read_time)
+
+            break
         #prediction = list(lb.inverse_transform([prediction_index]))[0]
         # write prediction
         #with open ("logs/audio_logx.txt","a") as logs:
@@ -159,6 +156,12 @@ if NN == True:
     p.terminate()
     print('stop streaming')
 
+waveFile = wave.open('test_audio.wav', 'wb')
+waveFile.setnchannels(1)
+waveFile.setsampwidth(2)
+waveFile.setframerate(sampling_rate)
+waveFile.writeframes(b''.join(current_window))
+waveFile.close()
 
-
-# the whole process takes 14.4s
+file_name = 'test_audio.wav'
+## the whole process takes 12.75s
