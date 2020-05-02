@@ -117,7 +117,6 @@ if NN == True:
     print('ready to start')
     
     while(True):
-        
         # calculate mean signal power
         read_time = time.time()
         #print('start streaming')
@@ -126,70 +125,30 @@ if NN == True:
         data = stream.read(total_samples, exception_on_overflow = False)
         current_window = np.fromstring(data, dtype=np.int16)
         
-        freq_signal = np.fft.fft(current_window)
-        len_signal = len(current_window)
-        len_half = np.ceil((len_signal + 1) / 2.0).astype(np.int) 
-        freq_signal = abs(freq_signal[0:len_half]) / len_signal
-        freq_signal **= 2  
-        len_fts = len(freq_signal)
-        
-        if len_signal % 2:
-            freq_signal[1:len_fts] *= 2
-        else:
-            freq_signal[1:len_fts-1] *= 2
-        
-        signal_power = 10 * np.log10(freq_signal)
-        # remov any nans and infs
-        signal_power = signal_power[~np.isnan(signal_power)]
-        signal_power = signal_power[~np.isinf(signal_power)]
-
-        mean_signal_power = np.mean(signal_power)
-        
-        #print(mean_signal_power)
-        
-        if mean_signal_power > -20:
-            npred += 1
+        npred += 1
             
-            waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
-            waveFile.setnchannels(1)
-            waveFile.setsampwidth(2)
-            waveFile.setframerate(sampling_rate)
-            waveFile.writeframes(b''.join(current_window[int(len(current_window)/3):int(len(current_window)+ len(current_window)/3)]))
-            waveFile.close()
+        waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
+        waveFile.setnchannels(1)
+        waveFile.setsampwidth(2)
+        waveFile.setframerate(sampling_rate)
+        waveFile.writeframes(b''.join(current_window[int(len(current_window)/3):int(len(current_window)+ len(current_window)/3)]))
+        waveFile.close()
 
-            file_name = 'test_audio' + str(npred) +'.wav'
+        file_name = 'test_audio' + str(npred) +'.wav'
 
-            print('start to predicting {}'.format(str(npred)))
-            prediction = NN_predict(model = production_models,
+        print('start to predicting {}'.format(str(npred)))
+        prediction = NN_predict(model = production_models,
                         audio_input = file_name,
                         sample_rate = sampling_rate,
                         scaler = sc)
-            print(prediction)
+        print(prediction)
 
-            end_time = time.time()
-            print('Predicting_duration {}'.format(str(read_time-start_time)))
+        end_time = time.time()
+        print('Predicting_duration {}'.format(str(read_time-start_time)))
             
-            
-            with open("audio_logs.txt",'a') as logs:
-                logs.write("{} prediction: {} at time: {} \n".format(str(npred), prediction, str(read_time-start_time)))
-            
-        #prediction = list(lb.inverse_transform([prediction_index]))[0]
-        # write prediction
-        #with open ("logs/audio_logx.txt","a") as logs:
-        #    logs.write("predicting {} at time {}".format(prediction, str(read_time-start_time)))
-
-        
-        #if (time.time() - read_time >= 10):
-         #   print('break')
-          #  break
-        else:
-            #print("within quiet range")
-            pass
-        
-        if (time.time() - start_time) >= 500:
-            print('Time out')
+        if npred >=1:
             break
-    
+        
     stream.write(current_window)
     stream.stop_stream()
     stream.close()

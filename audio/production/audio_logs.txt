@@ -1,0 +1,31 @@
+prediction: [5, 'engine_idling'] at time: 18.16463804244995 
+prediction: [1, 'car_horn'] at time: 29.82565474510193 
+prediction: [5, 'engine_idling'] at time: 35.323383808135986 
+prediction: [5, 'engine_idling'] at time: 45.26152729988098 
+prediction: [5, 'engine_idling'] at time: 55.04495429992676 
+prediction: [5, 'engine_idling'] at time: 64.85259485244751 
+prediction: [5, 'engine_idling'] at time: 74.4028205871582 
+prediction: [0, 'air_conditioner'] at time: 84.1791660785675 
+prediction: [4, 'drilling'] at time: 94.01386761665344 
+prediction: [1, 'car_horn'] at time: 103.80339765548706 
+prediction: [5, 'engine_idling'] at time: 109.33042454719543 
+prediction: [5, 'engine_idling'] at time: 114.77800273895264 
+prediction: [5, 'engine_idling'] at time: 120.4923722743988 
+prediction: [5, 'engine_idling'] at time: 18.206509828567505 
+prediction: [5, 'engine_idling'] at time: 29.817335844039917 
+prediction: [5, 'engine_idling'] at time: 35.33319115638733 
+prediction: [5, 'engine_idling'] at time: 45.40519142150879 
+prediction: [5, 'engine_idling'] at time: 50.93807649612427 
+prediction: [5, 'engine_idling'] at time: 60.93363332748413 
+prediction: [5, 'engine_idling'] at time: 70.51938772201538 
+prediction: [5, 'engine_idling'] at time: 80.28578019142151 
+prediction: [5, 'engine_idling'] at time: 85.7974841594696 
+prediction: [5, 'engine_idling'] at time: 91.50407528877258 
+prediction: [4, 'drilling'] at time: 101.47543025016785 
+prediction: [5, 'engine_idling'] at time: 106.76035737991333 
+prediction: [5, 'engine_idling'] at time: 116.73588848114014 
+prediction: [5, 'engine_idling'] at time: 122.23430323600769 
+prediction: [5, 'engine_idling'] at time: 127.94207262992859 
+prediction: [5, 'engine_idling'] at time: 133.4324426651001 
+1 prediction: [5, 'engine_idling'] at time: 14.26671814918518 
+2 prediction: [5, 'engine_idling'] at time: 54.50599956512451 
