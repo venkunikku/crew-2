@@ -17,12 +17,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.externals import joblib
 
 #from NN_model.inference_NN import extract_feature, NN_predict
-import sys
 
-if not sys.warnoptions:
-    import warnings
-    warnings.simplefilter("ignore")
-    
 
 def extract_feature(file_name):
     #extract all required feaures from a sound wave and stack them into a one row array
@@ -76,6 +71,8 @@ sampling_rate = 44100
 
 # Degfine chunk_size
 chunk_size = 8192
+#8192
+
 
 # Define recording length and total sampled needed
 record_seconds = 4
@@ -86,7 +83,7 @@ total_samples = sampling_rate * record_seconds
 # initialize portaudio
 p = pyaudio.PyAudio()
 
-py_format = pyaudio.paInt16
+py_format = pyaudio.paFloat32
 
 # for NN inference
 #hmm = True
@@ -124,7 +121,7 @@ if NN == True:
         stream.start_stream()
         
         data = stream.read(total_samples, exception_on_overflow = False)
-        current_window = np.fromstring(data, dtype=np.int16)
+        current_window = np.frombuffer(data, dtype=np.float32)
         
         freq_signal = np.fft.fft(current_window)
         len_signal = len(current_window)
@@ -145,34 +142,43 @@ if NN == True:
 
         mean_signal_power = np.mean(signal_power)
         
-        #print(mean_signal_power)
+        print(mean_signal_power)
         
-        if mean_signal_power > -20:
-            npred += 1
-            
-            waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
-            waveFile.setnchannels(1)
-            waveFile.setsampwidth(2)
-            waveFile.setframerate(sampling_rate)
-            waveFile.writeframes(b''.join(current_window[int(len(current_window)/3):int(len(current_window)+ len(current_window)/3)]))
-            waveFile.close()
+        if mean_signal_power > -109.5:
+            #hear_time = time.time()
+            if npred == 0:
+                print('Start!')
+                npred += 1
+            else:
+                
+                waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
+                waveFile.setnchannels(1)
+                waveFile.setsampwidth(2)
+                waveFile.setframerate(sampling_rate)
+                #waveFile.writeframes(b''.join(current_window[int(len(current_window)/3):int(len(current_window)+ len(current_window)/3)]))
+                waveFile.writeframes(b''.join(current_window))
 
-            file_name = 'test_audio' + str(npred) +'.wav'
+                waveFile.close()
 
-            print('start to predicting {}'.format(str(npred)))
-            prediction = NN_predict(model = production_models,
-                        audio_input = file_name,
-                        sample_rate = sampling_rate,
-                        scaler = sc)
-            print(prediction)
+                file_name = 'test_audio' + str(npred) +'.wav'
 
-            end_time = time.time()
-            print('Predicting_duration {}'.format(str(read_time-start_time)))
-            
-            
-            with open("audio_logs.txt",'a') as logs:
-                logs.write("{} prediction: {} at time: {} \n".format(str(npred), prediction, str(read_time-start_time)))
-            
+                print('start to predicting {}'.format(str(npred)))
+                prediction = NN_predict(model = production_models,
+                            audio_input = file_name,
+                            sample_rate = sampling_rate,
+                            scaler = sc)
+                
+                print(prediction)
+
+                end_time = time.time()
+                print('Predicting_duration {}'.format(str(end_time - read_time)))
+                
+                
+                with open("audio_logs.txt",'a') as logs:
+                    logs.write("{} prediction: {} at time: {} \n".format(str(npred), prediction, str(read_time-start_time)))
+                
+                npred += 1
+                
         #prediction = list(lb.inverse_transform([prediction_index]))[0]
         # write prediction
         #with open ("logs/audio_logx.txt","a") as logs:
@@ -186,7 +192,7 @@ if NN == True:
             #print("within quiet range")
             pass
         
-        if (time.time() - start_time) >= 500:
+        if (time.time() - start_time) >= 120:
             print('Time out')
             break
     

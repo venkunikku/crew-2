@@ -19,5 +19,17 @@ pip3 install hmmlearn
 pip3 install pomegranate==0.10
 
 
+# NN dependencies
+pip3 install tensorflow
+pip3 install keras
+pip3 install sklearn
+
+
+# Streaming audio
+pip3 install librosa
+pip3 install pyaudio
+pip3 install wave
+pip3 install time
+pip3 install sys
 
 

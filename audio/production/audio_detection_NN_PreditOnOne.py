@@ -86,7 +86,7 @@ total_samples = sampling_rate * record_seconds
 # initialize portaudio
 p = pyaudio.PyAudio()
 
-py_format = pyaudio.paInt16
+py_format = pyaudio.paFloat32
 
 # for NN inference
 #hmm = True
@@ -123,7 +123,7 @@ if NN == True:
         stream.start_stream()
         
         data = stream.read(total_samples, exception_on_overflow = False)
-        current_window = np.fromstring(data, dtype=np.int16)
+        current_window = np.fromstring(data, dtype=np.float32)
         
         npred += 1
             
