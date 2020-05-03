@@ -144,40 +144,39 @@ if NN == True:
         
         print(mean_signal_power)
         
-        if mean_signal_power > -20:
+        if mean_signal_power > -20 and npred ==0:
             #hear_time = time.time()
-            if npred == 0:
-                print('Start!')
-                npred += 1
-            else:
+            print('Start!')
+            npred += 1
+        if mean_signal_power > -8 and npred != 0:
                 
-                waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
-                waveFile.setnchannels(1)
-                waveFile.setsampwidth(2)
-                waveFile.setframerate(sampling_rate)
+            waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
+            waveFile.setnchannels(1)
+            waveFile.setsampwidth(2)
+            waveFile.setframerate(sampling_rate)
                 #waveFile.writeframes(b''.join(current_window[int(len(current_window)/3):int(len(current_window)+ len(current_window)/3)]))
-                waveFile.writeframes(b''.join(current_window))
+            waveFile.writeframes(b''.join(current_window))
 
-                waveFile.close()
+            waveFile.close()
 
-                file_name = 'test_audio' + str(npred) +'.wav'
+            file_name = 'test_audio' + str(npred) +'.wav'
 
-                print('start to predicting {}'.format(str(npred)))
-                prediction = NN_predict(model = production_models,
+            print('start to predicting {}'.format(str(npred)))
+            prediction = NN_predict(model = production_models,
                             audio_input = file_name,
                             sample_rate = sampling_rate,
                             scaler = sc)
                 
-                print(prediction)
+            print(prediction)
 
-                end_time = time.time()
-                print('Predicting_duration {}'.format(str(end_time - read_time)))
+            end_time = time.time()
+            print('Predicting_duration {}'.format(str(end_time - read_time)))
                 
                 
-                with open("audio_logs.txt",'a') as logs:
+            with open("audio_logs.txt",'a') as logs:
                     logs.write("{} prediction: {} at time: {} \n".format(str(npred), prediction, str(read_time-start_time)))
                 
-                npred += 1
+            npred += 1
                 
         #prediction = list(lb.inverse_transform([prediction_index]))[0]
         # write prediction
