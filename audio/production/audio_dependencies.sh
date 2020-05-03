@@ -27,7 +27,7 @@ pip3 install sklearn
 
 # Streaming audio
 pip3 install librosa
-pip3 install pyaudio
+#pip3 install pyaudio
 pip3 install wave
 pip3 install time
 pip3 install sys
