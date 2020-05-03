@@ -70,7 +70,7 @@ def NN_predict(audio_input, model, sample_rate, scaler):
 sampling_rate = 44100
 
 # Degfine chunk_size
-chunk_size = 8192
+chunk_size = 100
 #8192
 
 
@@ -83,7 +83,7 @@ total_samples = sampling_rate * record_seconds
 # initialize portaudio
 p = pyaudio.PyAudio()
 
-py_format = pyaudio.paFloat32
+py_format = pyaudio.paInt16
 
 # for NN inference
 #hmm = True
@@ -121,7 +121,7 @@ if NN == True:
         stream.start_stream()
         
         data = stream.read(total_samples, exception_on_overflow = False)
-        current_window = np.frombuffer(data, dtype=np.float32)
+        current_window = np.frombuffer(data, dtype=np.int16)
         
         freq_signal = np.fft.fft(current_window)
         len_signal = len(current_window)
@@ -144,7 +144,7 @@ if NN == True:
         
         print(mean_signal_power)
         
-        if mean_signal_power > -109.5:
+        if mean_signal_power > -20:
             #hear_time = time.time()
             if npred == 0:
                 print('Start!')

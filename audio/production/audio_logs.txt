@@ -57,3 +57,11 @@ prediction: [5, 'engine_idling'] at time: 133.4324426651001
 3 prediction: [6, 'gun_shot'] at time: 56.96883010864258 
 4 prediction: [4, 'drilling'] at time: 89.92154097557068 
 5 prediction: [4, 'drilling'] at time: 106.63756799697876 
+1 prediction: [4, 'drilling'] at time: 43.22368407249451 
+2 prediction: [4, 'drilling'] at time: 57.737624168395996 
+3 prediction: [4, 'drilling'] at time: 67.0607168674469 
+1 prediction: [5, 'engine_idling'] at time: 34.91443943977356 
+2 prediction: [9, 'street_music'] at time: 48.12572479248047 
+3 prediction: [3, 'dog_bark'] at time: 59.76822257041931 
+4 prediction: [9, 'street_music'] at time: 87.86684131622314 
+5 prediction: [3, 'dog_bark'] at time: 107.91162919998169 
