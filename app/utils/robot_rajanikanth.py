@@ -139,8 +139,8 @@ class NavigateRajani:
     def move_towards_the_cone_using_distance_sensor(self):
         dist_sensor = self.gopi_easy.init_distance_sensor()
 
-        while True:
-            print("Distance Sensor Reading (mm): " + str(dist_sensor.read_mm()))
+        #while True:
+        print("Distance Sensor Reading (mm): " + str(dist_sensor.read_inches()))
 
     def move_towards_the_cone(self, drive_inches=3):
 

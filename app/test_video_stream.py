@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
 
     logger.info("Creating the the object for Robot class")
-    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="green") as test:
+    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
         print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home())
         #print(test.circle_the_cone())
         #print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
