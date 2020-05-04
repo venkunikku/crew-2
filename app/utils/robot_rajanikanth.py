@@ -143,7 +143,7 @@ class NavigateRajani:
         if metrics == "mm":
             return dist_sensor.read_mm()
 
-    def move_towards_the_cone(self, drive_inches=3, dist_to_object=("inches", 15), dist_sensor_error=3):
+    def move_towards_the_cone(self, drive_inches=3, dist_to_object=("inches", 10), dist_sensor_error=3):
 
         while True:
             self.center_the_cone()
@@ -178,7 +178,9 @@ class NavigateRajani:
                     # finally before the cone starts to orbit we are making it more precise.
                     distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
                     required_dist_to_cone = dist_to_object[1]
-                    if required_dist_to_cone > distance_to_cone:
+                    print(f"Precise: {required_dist_to_cone}, {distance_to_cone} ")
+                    if required_dist_to_cone < distance_to_cone:
+                        print(f"Audjusting to this distance: {(distance_to_cone + dist_sensor_error) - required_dist_to_cone}")
                         self.gopi_easy.drive_inches((distance_to_cone + dist_sensor_error) - required_dist_to_cone)
                     return self
                 self.center_the_cone(precise=False)
