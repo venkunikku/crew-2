@@ -23,7 +23,7 @@ class NavigateRajani:
     '''
 
     def __init__(self, home_cone_color="yellow", destination_cone_color="red",
-                 show_video=False, show_video_limit=True, inference=False, is_audio_inference=False):
+                 show_video=False, show_video_limit=False, inference=False, is_audio_inference=False):
         self.log = logging.getLogger('gpg.find_cone')
 
         self.camera = StreamThreaded()
@@ -46,7 +46,7 @@ class NavigateRajani:
 
         # This will open a new cv2 to show the video feed in a different thread.
         if self.show_video:
-            self.cv2_window = Thread(target=self.show_video_feed, args=())
+            self.cv2_window = Thread(target=self.show_video_feed, args=(self.show_video_limit, ), name="Video Feed Thread")
             print("thread-2", self.cv2_window)
             self.cv2_window.start()
             print("Starting thread-2")
@@ -266,7 +266,7 @@ class NavigateRajani:
     def midpoint(ptA, ptB):
         return (ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5
 
-    def show_video_feed(self):
+    def show_video_feed(self, show_video_limit):
         logging.info("Showing the video feed")
         while True:
             frame = self.camera.read()
@@ -279,16 +279,16 @@ class NavigateRajani:
         while True:
             frame = self.camera.read()
             if not (frame is None):
-                if not self.show_video_limit:
-                    # flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
-                    # if total_cones:
-                    #     rect_bottom_mind_point = self.get_cone_bottom_mid_point(boxes)
-                    #     cv2.putText(frame_back, f"bottom: {rect_bottom_mind_point}",
-                    #                 (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])),
-                    #                 cv2.FONT_HERSHEY_SIMPLEX,
-                    #                 .5, (0, 255, 255), 1, cv2.LINE_AA)
-                    #     frame = frame_back
-                    # frame = NavigateRajani.center_boundaries(frame)
+                if not show_video_limit:
+                    flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+                    if total_cones:
+                        rect_bottom_mind_point = self.get_cone_bottom_mid_point(boxes)
+                        cv2.putText(frame_back, f"bottom: {rect_bottom_mind_point}",
+                                    (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])),
+                                    cv2.FONT_HERSHEY_SIMPLEX,
+                                    .5, (0, 255, 255), 1, cv2.LINE_AA)
+                        frame = frame_back
+                    frame = NavigateRajani.center_boundaries(frame)
 
                     cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
                     cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
