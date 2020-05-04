@@ -64,7 +64,7 @@ class NavigateRajani:
                 print("Checking Degree", turn_to_degree)
                 self.log.info(f"Moving to the following degree {turn_to_degree}")
                 self.gopi_easy.turn_degrees(turn_to_degree)
-                time.sleep(2)
+                time.sleep(1)
                 frame = self.camera.read()
                 flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
                 if total_cones > 0:
@@ -136,11 +136,18 @@ class NavigateRajani:
                     self.cone_data = cones_data
                     return self
 
+    def move_towards_the_cone_using_distance_sensor(self):
+        dist_sensor = self.gopi_easy.init_distance_sensor()
+
+        while True:
+            print("Distance Sensor Reading (mm): " + str(dist_sensor.read_mm()))
+
     def move_towards_the_cone(self, drive_inches=3):
 
         while True:
             self.center_the_cone()
             frame = self.camera.read()
+            self.move_towards_the_cone_using_distance_sensor()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
             if total_cones:
                 cone_bottom_mid_point = self.get_cone_bottom_mid_point(boxes)
