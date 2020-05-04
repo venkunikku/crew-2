@@ -9,6 +9,7 @@ from easygopigo3 import EasyGoPiGo3
 import time
 import logging
 from queue import Queue
+from hmm_models.hmm_audio_detection_modified import start_audio_model
 
 '''
 @newfield team: Venku Buragadda
@@ -22,8 +23,9 @@ class NavigateRajani:
     '''
 
     def __init__(self, home_cone_color="yellow", destination_cone_color="red",
-                 show_video=False, show_video_limit=True, inference=False):
-        self.log = logging.getLogger("main.navigation")
+                 show_video=False, show_video_limit=True, inference=False, is_audio_inference=False):
+        self.log = logging.getLogger('gpg.find_cone')
+
         self.camera = StreamThreaded()
         self.home_cone_color = home_cone_color
         self.camera.start()
@@ -40,6 +42,8 @@ class NavigateRajani:
         self.cone_data = None
         self.find_cone_obj = FindCones(color=destination_cone_color)
 
+        self.is_audio_inference = is_audio_inference
+
         # This will open a new cv2 to show the video feed in a different thread.
         if self.show_video:
             self.cv2_window = Thread(target=self.show_video_feed, args=())
@@ -54,6 +58,11 @@ class NavigateRajani:
             self.q = Queue()
             self.img_inference = Thread(target=infer_image, args=(self.q, 0.1))
             self.img_inference.start()
+
+        self.audio_inference = None
+        if self.is_audio_inference:
+            self.audio_inference = Thread(target=start_audio_model, args=())
+            self.audio_inference.start()
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
@@ -171,19 +180,26 @@ class NavigateRajani:
                     else:
                         self.gopi_easy.drive_inches(-drive_inches)
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
-                    self.gopi_easy.drive_inches(-1)
+                    # self.gopi_easy.drive_inches(-1)
+                    self.fine_tune_distance_to_the_cone(dist_sensor_error, dist_to_object)
 
                 else:
                     self.center_the_cone(precise=True)
                     # finally before the cone starts to orbit we are making it more precise.
-                    distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
-                    required_dist_to_cone = dist_to_object[1]
-                    print(f"Precise: {required_dist_to_cone}, {distance_to_cone} ")
-                    if required_dist_to_cone < distance_to_cone:
-                        print(f"Audjusting to this distance: {(distance_to_cone + dist_sensor_error) - required_dist_to_cone}")
-                        self.gopi_easy.drive_inches((distance_to_cone + dist_sensor_error) - required_dist_to_cone)
+                    self.fine_tune_distance_to_the_cone(dist_sensor_error, dist_to_object)
                     return self
                 self.center_the_cone(precise=False)
+
+    def fine_tune_distance_ot_the_cone(self, dist_sensor_error, dist_to_object):
+        distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
+        required_dist_to_cone = dist_to_object[1]
+        print(f"Precise: {required_dist_to_cone}, {distance_to_cone} ")
+        if required_dist_to_cone < distance_to_cone:
+            print(
+                f"Audjusting to this distance: {(distance_to_cone + dist_sensor_error) - required_dist_to_cone}")
+            self.gopi_easy.drive_inches((distance_to_cone + dist_sensor_error) - required_dist_to_cone)
+        else:
+            self.gopi_easy.drive_inches(-((distance_to_cone + dist_sensor_error) - required_dist_to_cone))
 
     def circle_the_cone(self, carpet=False):
 
@@ -219,8 +235,8 @@ class NavigateRajani:
 
     def there_is_nothing_like_home(self):
         self.find_cone_obj = FindCones(color=self.home_cone_color)
-        self.find_cone().center_the_cone(precise=False).move_towards_the_cone()
-        self.gopi_easy.drive_inches(10)
+        self.find_cone().center_the_cone(precise=False).move_towards_the_cone(dist_to_object=("inches", 5))
+        # self.gopi_easy.drive_inches(10)
         self.gopi_easy.turn_degrees(180)
         return self
 

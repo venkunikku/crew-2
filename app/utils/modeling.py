@@ -2,7 +2,7 @@ import time
 import cv2
 import numpy as np
 from threading import Thread
-
+import logging
 
 class InferImage:
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
@@ -68,11 +68,14 @@ class InferImage:
 
 
 def infer_image(q, conf):
+    log = logging.getLogger('gpg.find_cone')
     net = cv2.dnn.readNetFromCaffe("./model_weights/mobile_net_ssd/MobileNetSSD_deploy.prototxt",
                                            "./model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
+    log.info("Inferring the image")
     while True:
         image_path = q.get()
+        log.info("Path to image")
         print(f"Image we got for the image in the queue:", image_path)
         if image_path:
             print(f"yes we got an image")

@@ -1,22 +1,35 @@
-from app.utils import  robot_rajanikanth #video_stream, VideoStreamMulProcess,
+from app.utils import robot_rajanikanth  # video_stream, VideoStreamMulProcess,
 import cv2
 import time
 import traceback
 import atexit
 import os
 import logging
+from app.post_results.robo_client import connection
 
-process = True
-cam = None
-logger = logging.getLogger('main')
-logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
+import logging
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
+main_logger = logging.getLogger('gpg')
+main_logger.setLevel(logging.DEBUG)
+fname = 'gopigo.log'  # Any name for the log file
 
-logger.addHandler(ch)
+# Create the FileHandler object. This is required!
+fh = logging.FileHandler(fname, mode='w')
+fh.setLevel(logging.INFO)  # Will write to the log file the messages with level >= logging.INFO
+
+# The following row is strongly recommended for the GoPiGo Test!
+fh_formatter = logging.Formatter('%(relativeCreated)d,%(name)s,%(message)s')
+fh.setFormatter(fh_formatter)
+main_logger.addHandler(fh)
+
+# The StreamHandler is optional for you. Use it just to debug your program code
+sh = logging.StreamHandler()
+sh_formatter = logging.Formatter('%(relativeCreated)8d %(name)s %(levelname)s %(message)s')
+sh.setLevel(logging.DEBUG)
+sh.setFormatter(sh_formatter)
+main_logger.addHandler(sh)
+main_logger.debug('Logger started')  # This debug message will be handled only by StreamHendler
+
 
 def clean_up():
     global cam
@@ -24,53 +37,24 @@ def clean_up():
     cam.stop()
 
 
-if __name__ == '__main__':
-    
+def send_log_to_server():
+    HOST, PORT = 'datastream.ilykei.com', 30078
+    login = 'venku@uchicago.edu'
+    password = 'Bne3SqJG'
+    split_id = 19
+    filename = 'gpg.log'
+    connection(HOST, PORT, login, password, split_id, filename)
 
-    logger.info("Creating the the object for Robot class")
+
+if __name__ == '__main__':
+    mic_logger = logging.getLogger('gpg.mic')
+    mic_logger.info('Start')
+
     with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
-        print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home())
-        #print(test.circle_the_cone())
-        #print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
-        #print(test.there_is_nothing_like_home())
+        print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
+            drive_inches=8).circle_the_cone().there_is_nothing_like_home())
+        # print(test.circle_the_cone())
+        # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
+        # print(test.there_is_nothing_like_home())
         input("press key to stop")
 
-
-# 	#cam = VideoStreamMulProcess.StreamMultiProcssing().start()
-# 	#cam = VideoStream.StreamThreaded().start()
-# 	#cam = VideoStreamMulProcess.MultiProcessInitiate().start()
-# 	cam = VideoStreamMulProcess.run_process()
-# 	atexit.register(clean_up)
-# 	time.sleep(2.0)
-# 	try:
-# 		#cam.start()
-# 		#print(cam.read())
-# 		while True:
-# 			frame = cam[0]#.read()
-# 			#print("Main", os.getpid())
-# 			#print(f"Frame: {type(frame)}")
-#
-# # 			while frame.empty is False:
-# #                             print(frame.get())
-#
-# 			if process:
-# 				while frame.empty() is False:
-# 					cv2.imshow("inter", frame.get())
-# 			else:
-# 				cv2.imshow("inter", frame)
-#
-# 			k = cv2.waitKey(1) & 0xFF
-# 			if k ==27:
-# 				print("Clicked on escape")
-# 				break
-# 			#print(".", end=" ")
-# 		cv2.destroyAllWindows()
-# 		#cam.stop()
-# 		cam[1].join()
-# 		cam[1].terminate()
-# 	except (KeyboardInterrupt, Exception) as e:
-# 		print("Error", e)
-# 		cam.stop()
-# 		print(traceback.print_exc())
-# 	finally:
-# 		cam.stop()
