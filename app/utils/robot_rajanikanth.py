@@ -9,7 +9,7 @@ from easygopigo3 import EasyGoPiGo3
 import time
 import logging
 from queue import Queue
-from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
+# from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
 
 '''
 @newfield team: Venku Buragadda
@@ -60,9 +60,9 @@ class NavigateRajani:
             self.img_inference.start()
 
         self.audio_inference = None
-        if self.is_audio_inference:
-            self.audio_inference = Thread(target=start_audio_model, args=())
-            self.audio_inference.start()
+        # if self.is_audio_inference:
+        #     self.audio_inference = Thread(target=start_audio_model, args=())
+        #     self.audio_inference.start()
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
