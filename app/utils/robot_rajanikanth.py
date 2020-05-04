@@ -91,8 +91,8 @@ class NavigateRajani:
             if total_cones > 0:
                 cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
-                print(f"Cone data: {cone_bounding_box}")
-                print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
+                # print(f"Cone data: {cone_bounding_box}")
+                # print(f"Coordinates: ", left_top_bound_line_coord, rigth_top_bound_line_coord)
                 steer = 1
                 if precise:
                     time.sleep(1)
@@ -107,7 +107,7 @@ class NavigateRajani:
                         left_top_bound_line_coord[0] - 40, rigth_top_bound_line_coord[0] + 40)
                     steer = 3
                     self.gopi_easy.set_eye_color((0, 255, 127))
-                print(f"Center Boundary", center_boundary_left_right_width)
+                # print(f"Center Boundary", center_boundary_left_right_width)
 
                 if not center_boundary_left_right_width[0] <= cone_bounding_box[0] <= center_boundary_left_right_width[
                     1]:
@@ -136,18 +136,19 @@ class NavigateRajani:
                     self.cone_data = cones_data
                     return self
 
-    def move_towards_the_cone_using_distance_sensor(self):
+    def move_towards_the_cone_using_distance_sensor(self, metrics="inches"):
         dist_sensor = self.gopi_easy.init_distance_sensor()
+        if metrics == 'inches':
+            return dist_sensor.read_inches()
+        if metrics == "mm":
+            return dist_sensor.read_mm()
 
-        #while True:
-        print("Distance Sensor Reading (mm): " + str(dist_sensor.read_inches()))
-
-    def move_towards_the_cone(self, drive_inches=3):
+    def move_towards_the_cone(self, drive_inches=3, dist_to_object=("inches", 15), dist_sensor_error=3):
 
         while True:
             self.center_the_cone()
             frame = self.camera.read()
-            self.move_towards_the_cone_using_distance_sensor()
+            distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
             if total_cones:
                 cone_bottom_mid_point = self.get_cone_bottom_mid_point(boxes)
@@ -174,6 +175,11 @@ class NavigateRajani:
 
                 else:
                     self.center_the_cone(precise=True)
+                    # finally before the cone starts to orbit we are making it more precise.
+                    distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
+                    required_dist_to_cone = dist_to_object[1]
+                    if required_dist_to_cone > distance_to_cone:
+                        self.gopi_easy.drive_inches((distance_to_cone + dist_sensor_error) - required_dist_to_cone)
                     return self
                 self.center_the_cone(precise=False)
 
