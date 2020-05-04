@@ -9,7 +9,7 @@ from easygopigo3 import EasyGoPiGo3
 import time
 import logging
 from queue import Queue
-from hmm_models.hmm_audio_detection_modified import start_audio_model
+from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
 
 '''
 @newfield team: Venku Buragadda
