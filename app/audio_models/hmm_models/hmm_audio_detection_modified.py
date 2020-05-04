@@ -3,6 +3,7 @@
 
 # start clock from beginning 
 import time
+
 start_time = time.time()
 
 import numpy as np
@@ -17,6 +18,7 @@ import scipy.io.wavfile as wavfile
 
 import hmm_inference
 import logging
+
 
 def start_audio_model():
     mic_logger = logging.getLogger('gpg.mic')
@@ -82,7 +84,3 @@ def start_audio_model():
         else:
             print("within quiet range")
             pass
-
-
-
-
