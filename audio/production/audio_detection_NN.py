@@ -13,7 +13,7 @@ import tensorflow as tf
 from keras.models import load_model
 import os
 
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from sklearn.externals import joblib
 
 #from NN_model.inference_NN import extract_feature, NN_predict
@@ -93,12 +93,12 @@ npred = 0
 if NN == True:
 
     # load in model
-    production_models = load_model('NN_model/NN_model_weights.h5')
+    production_models = load_model('NN_model/5_3_NN.h5')
 
     # Load the standard scaler from training data
     features_array = joblib.load('features_array.sav')
     features = np.array(features_array)
-    sc = StandardScaler()
+    sc = MinMaxScaler(feature_range = (-1,1))
     sc.fit(features)
 
     ### STREAMING ###
@@ -148,7 +148,7 @@ if NN == True:
             #hear_time = time.time()
             print('Start!')
             npred += 1
-        if mean_signal_power > -8 and npred != 0:
+        if mean_signal_power > -6.8 and npred != 0:
                 
             waveFile = wave.open('test_audio' + str(npred) +'.wav', 'wb')
             waveFile.setnchannels(1)
@@ -174,7 +174,7 @@ if NN == True:
                 
                 
             with open("audio_logs.txt",'a') as logs:
-                    logs.write("{} prediction: {} at time: {} \n".format(str(npred), prediction, str(read_time-start_time)))
+                    logs.write("{} prediction: {} at time: {} \n".format(str(npred), prediction, str(read_time - start_time)))
                 
             npred += 1
                 
