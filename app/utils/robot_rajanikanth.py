@@ -52,9 +52,8 @@ class NavigateRajani:
         self.q = None
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.1 ))
+            self.img_inference = Thread(target=infer_image, args=(self.q, 0.1))
             self.img_inference.start()
-
 
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
@@ -85,7 +84,7 @@ class NavigateRajani:
         horiztl_line_upper_right_coord, left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, \
         rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(frame)
         while True:
-            #time.sleep(3)
+            # time.sleep(3)
             frame = self.camera.read()
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
 
@@ -165,7 +164,7 @@ class NavigateRajani:
                         self.gopi_easy.drive_inches(-drive_inches)
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
                     self.gopi_easy.drive_inches(-1)
-                    
+
                 else:
                     self.center_the_cone(precise=True)
                     return self
@@ -182,7 +181,7 @@ class NavigateRajani:
             self.servo.rotate_servo(10)
             time.sleep(1)
             self.camera.camera.capture('foo1.jpg')
-            
+
             time.sleep(2)
             self.infer_image('foo1.jpg')
 
@@ -228,16 +227,20 @@ class NavigateRajani:
         return (ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5
 
     def show_video_feed(self):
-        frame = self.camera.read()
-        center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
-        left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
-            frame)
+
+        while True:
+            frame = self.camera.read()
+            if not (frame is None):
+                center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, \
+                left_bottom_bound_line_coord, left_top_bound_line_coord, right_bottom_bound_line_coord, rigth_top_bound_line_coord, width = NavigateRajani.screen_coordinates(
+                    frame)
+                break
+
         while True:
             frame = self.camera.read()
             if not (frame is None):
                 if not self.show_video_limit:
                     frame = NavigateRajani.center_boundaries(frame)
-
 
                     cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
                     cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
