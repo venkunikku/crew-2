@@ -296,6 +296,7 @@ class NavigateRajani:
                     cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
 
                     # Center vertical line
+                    print("Central vertical line", center_of_screen_coord[0], (center_of_screen_coord[0], width))
                     cv2.line(frame, (center_of_screen_coord[0], 0), (center_of_screen_coord[0], width), [0, 255, 0], 1)
 
                     cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)
