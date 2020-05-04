@@ -130,7 +130,7 @@ class NavigateRajani:
                         time.sleep(1)
                         self.gopi_easy.stop()
                         self.gopi_easy.close_left_eye()
-
+                        time.sleep(1)
                     if cone_bounding_box[0] < height_range[1]:
                         # move left
                         print(F"Moving left")
@@ -140,6 +140,7 @@ class NavigateRajani:
                         time.sleep(1)
                         self.gopi_easy.close_right_eye()
                         self.gopi_easy.stop()
+                        time.sleep(1)
                 else:
                     # getting update cone data after the robot is centered.
                     self.cone_data = cones_data
@@ -182,6 +183,7 @@ class NavigateRajani:
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
                     # self.gopi_easy.drive_inches(-1)
                     self.fine_tune_distance_to_the_cone(dist_sensor_error, dist_to_object)
+                    time.sleep(2)
 
                 else:
                     self.center_the_cone(precise=True)
@@ -235,7 +237,7 @@ class NavigateRajani:
 
     def there_is_nothing_like_home(self):
         self.find_cone_obj = FindCones(color=self.home_cone_color)
-        self.find_cone().center_the_cone(precise=False).move_towards_the_cone(dist_to_object=("inches", 5))
+        self.find_cone().center_the_cone(precise=True).move_towards_the_cone(drive_inches=8, dist_to_object=("inches", 5))
         # self.gopi_easy.drive_inches(10)
         self.gopi_easy.turn_degrees(180)
         return self
