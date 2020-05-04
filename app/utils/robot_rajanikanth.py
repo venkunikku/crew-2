@@ -190,7 +190,7 @@ class NavigateRajani:
                     return self
                 self.center_the_cone(precise=False)
 
-    def fine_tune_distance_ot_the_cone(self, dist_sensor_error, dist_to_object):
+    def fine_tune_distance_to_the_cone(self, dist_sensor_error, dist_to_object):
         distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
         required_dist_to_cone = dist_to_object[1]
         print(f"Precise: {required_dist_to_cone}, {distance_to_cone} ")
