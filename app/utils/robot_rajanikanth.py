@@ -267,7 +267,7 @@ class NavigateRajani:
         return (ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5
 
     def show_video_feed(self):
-
+        logging.info("Showing the video feed")
         while True:
             frame = self.camera.read()
             if not (frame is None):
@@ -313,7 +313,7 @@ class NavigateRajani:
                 #             cv2.LINE_AA)
 
 
-                cv2.imshow("Video Feed", frame)
+                cv2.imshow("Video Feed - 1", frame)
                 if self.hard_stop:
                     break
                 key = cv2.waitKey(1) & 0xFF
