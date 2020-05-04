@@ -7,7 +7,7 @@ import struct
 import logging
 
 
-import robotics_pb2
+from app.post_results import robotics_pb2
 
 
 def connection(host, port, login, password, split_id, filename):
