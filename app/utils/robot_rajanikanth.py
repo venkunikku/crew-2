@@ -280,6 +280,14 @@ class NavigateRajani:
             frame = self.camera.read()
             if not (frame is None):
                 if not self.show_video_limit:
+                    flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+                    if total_cones:
+                        rect_bottom_mind_point = self.get_cone_bottom_mid_point(boxes)
+                        cv2.putText(frame_back, f"bottom: {rect_bottom_mind_point}",
+                                    (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])),
+                                    cv2.FONT_HERSHEY_SIMPLEX,
+                                    .5, (0, 255, 255), 1, cv2.LINE_AA)
+                        frame = frame_back
                     frame = NavigateRajani.center_boundaries(frame)
 
                     cv2.line(frame, left_top_bound_line_coord, left_bottom_bound_line_coord, [232, 206, 190], 1)
@@ -302,14 +310,7 @@ class NavigateRajani:
 
                 # cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
                 #             cv2.LINE_AA)
-                flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
-                if total_cones:
-                    rect_bottom_mind_point = self.get_cone_bottom_mid_point(boxes)
-                    cv2.putText(frame_back, f"bottom: {rect_bottom_mind_point}",
-                                (int(rect_bottom_mind_point[0]), int(rect_bottom_mind_point[1])),
-                                cv2.FONT_HERSHEY_SIMPLEX,
-                                .5, (0, 255, 255), 1, cv2.LINE_AA)
-                    frame = frame_back
+
 
                 cv2.imshow("Video Feed", frame)
                 if self.hard_stop:
