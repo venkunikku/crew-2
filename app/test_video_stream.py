@@ -8,6 +8,7 @@ import logging
 from app.post_results.robo_client import connection
 
 import logging
+import traceback
 
 main_logger = logging.getLogger('gpg')
 main_logger.setLevel(logging.DEBUG)
@@ -50,11 +51,13 @@ if __name__ == '__main__':
     mic_logger = logging.getLogger('gpg.mic')
     mic_logger.info('Start')
 
-    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
-        print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
-            drive_inches=8).circle_the_cone().there_is_nothing_like_home())
-        # print(test.circle_the_cone())
-        # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
-        # print(test.there_is_nothing_like_home())
-        input("press key to stop")
-
+    try:
+        with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
+            print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
+                drive_inches=8).circle_the_cone().there_is_nothing_like_home())
+            # print(test.circle_the_cone())
+            # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
+            # print(test.there_is_nothing_like_home())
+            input("press key to stop")
+    except:
+        print(traceback.print_exc())
