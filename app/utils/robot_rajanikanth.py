@@ -38,9 +38,9 @@ class NavigateRajani:
         self.cv2_window = None
         self.show_video_limit = show_video_limit
         self.hard_stop = False
-
+        self.destination_cone_color = destination_cone_color
         self.cone_data = None
-        self.find_cone_obj = FindCones(color=destination_cone_color)
+        self.find_cone_obj = FindCones(color=self.destination_cone_color)
 
         self.is_audio_inference = is_audio_inference
 
@@ -56,7 +56,7 @@ class NavigateRajani:
         self.q = None
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.1))
+            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5))
             self.img_inference.start()
 
         self.audio_inference = None
@@ -109,11 +109,11 @@ class NavigateRajani:
                     flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
                     cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
-                    center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+                    center_boundary_left_right_width = (left_top_bound_line_coord[0] - 50, rigth_top_bound_line_coord[0] - 50)
                     self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
                     center_boundary_left_right_width = (
-                        left_top_bound_line_coord[0] - 40, rigth_top_bound_line_coord[0] + 40)
+                        left_top_bound_line_coord[0] - 50, rigth_top_bound_line_coord[0] + 50)
                     steer = 3
                     self.gopi_easy.set_eye_color((0, 255, 127))
                 # print(f"Center Boundary", center_boundary_left_right_width)
@@ -172,7 +172,7 @@ class NavigateRajani:
                 # Screen bottom box line. top(upper) bottom(lower) left coordinates of Y
 
                 bottom_boundary_upper_lower_height = (
-                    horiztl_line_upper_left_coord[1] + 20, horiztl_line_lower_left_coord[1] + 20)
+                    horiztl_line_upper_left_coord[1] + 40, horiztl_line_lower_left_coord[1] + 40)
 
                 if not bottom_boundary_upper_lower_height[0] <= cone_lower_rec_boundary_mid_point_height <= \
                        bottom_boundary_upper_lower_height[1]:
@@ -240,7 +240,7 @@ class NavigateRajani:
         return self
 
     def infer_image(self, image_path):
-        self.q.put(image_path)
+        self.q.put((image_path, self.destination_cone_color))
 
     def there_is_nothing_like_home(self):
         self.find_cone_obj = FindCones(color=self.home_cone_color)

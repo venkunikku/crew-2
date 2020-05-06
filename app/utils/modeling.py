@@ -74,7 +74,7 @@ def infer_image(q, conf):
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
     log.info("Inferring the image")
     while True:
-        image_path = q.get()
+        image_path, cone_color = q.get()
         log.info("Path to image")
         print(f"Image we got for the image in the queue:", image_path)
         if image_path:
@@ -125,5 +125,6 @@ def infer_image(q, conf):
                     cv2.putText(image, label, (startX, y),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
                     cv2.imwrite("{}_inference.png".format(idx), image)
+                    log.info(cone_color, label)
                             
     
