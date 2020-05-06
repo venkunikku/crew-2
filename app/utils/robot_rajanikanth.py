@@ -9,7 +9,7 @@ from easygopigo3 import EasyGoPiGo3
 import time
 import logging
 from queue import Queue
-# from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
+from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
 
 '''
 @newfield team: Venku Buragadda
@@ -220,13 +220,13 @@ class NavigateRajani:
             # second semi circle
             self.gopi_easy.orbit(80, degrees)
             self.gopi_easy.turn_degrees(90)
-            self.gopi_easy.drive_inches(-4)
+            self.gopi_easy.drive_inches(-6)
             self.servo.reset_servo()
             time.sleep(2)
             self.camera.camera.capture('foo2.jpg')
             time.sleep(1)
             self.infer_image('foo2.jpg')
-            self.gopi_easy.drive_inches(4)
+            self.gopi_easy.drive_inches(6)
             self.gopi_easy.turn_degrees(-90)
             self.servo.rotate_servo(10)
 
@@ -296,7 +296,7 @@ class NavigateRajani:
                     cv2.line(frame, rigth_top_bound_line_coord, right_bottom_bound_line_coord, [232, 206, 190], 1)
 
                     # Center vertical line
-                    print("Central vertical line", center_of_screen_coord[0], (center_of_screen_coord[0], width))
+                    # print("Central vertical line", center_of_screen_coord[0], (center_of_screen_coord[0], width))
                     cv2.line(frame, (center_of_screen_coord[0], 0), (center_of_screen_coord[0], width), [0, 255, 0], 1)
 
                     cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)

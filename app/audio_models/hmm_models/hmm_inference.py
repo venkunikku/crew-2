@@ -3,7 +3,7 @@ import os
 
 from python_speech_features import mfcc
 
-from model_utils import HMM_Model
+from app.audio_models.hmm_models.model_utils import HMM_Model
 
 def hmm_inference(production_models, input_sample): 
     

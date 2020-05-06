@@ -16,7 +16,7 @@ from sklearn.externals import joblib
 
 import scipy.io.wavfile as wavfile
 
-import hmm_inference
+import app.audio_models.hmm_models.hmm_inference
 import logging
 
 
