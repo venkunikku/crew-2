@@ -59,5 +59,6 @@ if __name__ == '__main__':
             # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
             # print(test.there_is_nothing_like_home())
             input("press key to stop")
+            send_log_to_server()
     except:
         print(traceback.print_exc())
