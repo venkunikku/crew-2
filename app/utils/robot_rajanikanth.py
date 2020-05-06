@@ -9,6 +9,7 @@ from easygopigo3 import EasyGoPiGo3
 import time
 import logging
 from queue import Queue
+from app.utils.raspberry_utils import processor_temperature
 from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
 
 '''
@@ -324,9 +325,9 @@ class NavigateRajani:
                     cv2.putText(frame, f"Lower: {horiztl_line_lower_left_coord},{horiztl_line_lower_right_coord}",
                                 horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
-
-                # cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
-                #             cv2.LINE_AA)
+                temperature = processor_temperature()
+                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
+                            cv2.LINE_AA)
 
 
                 cv2.imshow("Video Feed - 1", frame)
