@@ -154,13 +154,15 @@ class NavigateRajani:
             return dist_sensor.read_mm()
 
     def move_towards_the_cone(self, drive_inches=3, dist_to_object=("inches", 10), dist_sensor_error=3):
-
+        is_cone_in_picture = 0
         while True:
             self.center_the_cone()
             frame = self.camera.read()
             distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
             flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+            is_cone_in_picture += 1
             if total_cones:
+                is_cone_in_picture = 0
                 cone_bottom_mid_point = self.get_cone_bottom_mid_point(boxes)
 
                 # Cone rectangel box bottom line mid point
@@ -172,13 +174,21 @@ class NavigateRajani:
                 # Screen bottom box line. top(upper) bottom(lower) left coordinates of Y
 
                 bottom_boundary_upper_lower_height = (
-                    horiztl_line_upper_left_coord[1] + 40, horiztl_line_lower_left_coord[1] + 40)
+                    horiztl_line_upper_left_coord[1] - 60, horiztl_line_lower_left_coord[1] + 40)
 
+                print(f"*********Boundaries calculated {bottom_boundary_upper_lower_height}")
+                # if the cone bounding box bottom line center is not with in the boundary
+                print(
+                    f"Top level if and else check {bottom_boundary_upper_lower_height[0]} <= {cone_lower_rec_boundary_mid_point_height}, <= {bottom_boundary_upper_lower_height[1]}  condition: {bottom_boundary_upper_lower_height[0] <= cone_lower_rec_boundary_mid_point_height <= bottom_boundary_upper_lower_height[1]}")
                 if not bottom_boundary_upper_lower_height[0] <= cone_lower_rec_boundary_mid_point_height <= \
                        bottom_boundary_upper_lower_height[1]:
+                    print(f"Checking if and  elif ")
                     if bottom_boundary_upper_lower_height[0] > cone_lower_rec_boundary_mid_point_height:
+                        print(F"boundr upp lower height is greated-dr fwd {bottom_boundary_upper_lower_height[0] } > {cone_lower_rec_boundary_mid_point_height}")
                         self.gopi_easy.drive_inches(drive_inches)
                     else:
+                        print(
+                            F"boundr upp lower height is lower-dr back: {bottom_boundary_upper_lower_height[0]} < {cone_lower_rec_boundary_mid_point_height}")
                         self.gopi_easy.drive_inches(-drive_inches)
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
                     # self.gopi_easy.drive_inches(-1)
@@ -191,6 +201,8 @@ class NavigateRajani:
                     self.fine_tune_distance_to_the_cone(dist_sensor_error, dist_to_object)
                     return self
                 self.center_the_cone(precise=False)
+            elif is_cone_in_picture > 30:
+                self.gopi_easy.drive_inches(-10)
 
     def fine_tune_distance_to_the_cone(self, dist_sensor_error, dist_to_object):
         distance_to_cone = self.move_towards_the_cone_using_distance_sensor(metrics=dist_to_object[0])
@@ -201,6 +213,7 @@ class NavigateRajani:
                 f"Audjusting to this distance: {(distance_to_cone + dist_sensor_error) - required_dist_to_cone}")
             self.gopi_easy.drive_inches((distance_to_cone + dist_sensor_error) - required_dist_to_cone)
         else:
+            print(f"Adjusting to negative distance: {((distance_to_cone + dist_sensor_error) - required_dist_to_cone)}")
             self.gopi_easy.drive_inches(-((distance_to_cone + dist_sensor_error) - required_dist_to_cone))
 
     def circle_the_cone(self, carpet=False, degrees=40):
@@ -302,8 +315,8 @@ class NavigateRajani:
                     cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)
                     cv2.line(frame, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, [200, 90, 60], 1)
 
-                    cv2.line(frame, (horiztl_line_upper_left_coord[0], horiztl_line_upper_left_coord[1]-50),
-                             (horiztl_line_upper_right_coord[0],horiztl_line_upper_right_coord[1]-50), [90, 120, 160], 2)
+                    cv2.line(frame, (horiztl_line_upper_left_coord[0], horiztl_line_upper_left_coord[1]-60),
+                             (horiztl_line_upper_right_coord[0],horiztl_line_upper_right_coord[1]-60), [90, 120, 160], 2)
 
                     cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}::: {horiztl_line_upper_left_coord[1]+40}",
                                 horiztl_line_upper_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
