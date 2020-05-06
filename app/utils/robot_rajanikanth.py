@@ -125,7 +125,7 @@ class NavigateRajani:
                     steer = 3
                     self.gopi_easy.set_eye_color((0, 255, 127))
                 print(f"************Center Boundary", center_boundary_left_right_width)
-
+                print(f" cone_bounding_box[0] > height_range[1] : {cone_bounding_box[0] > height_range[1]}, {cone_bounding_box[0]},{height_range[1]}")
                 if not center_boundary_left_right_width[0] <= cone_bounding_box[0] <= center_boundary_left_right_width[
                     1]:
                     print(
