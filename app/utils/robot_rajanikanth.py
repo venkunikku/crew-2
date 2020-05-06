@@ -326,7 +326,7 @@ class NavigateRajani:
                                 horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
                 temperature = processor_temperature()
-                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 1,
+                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 255), 4,
                             cv2.LINE_AA)
 
 
