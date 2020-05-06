@@ -125,6 +125,6 @@ def infer_image(q, conf):
                     cv2.putText(image, label, (startX, y),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
                     cv2.imwrite("{}_inference.png".format(idx), image)
-                    log.info(f"({cone_color}, {CLASSES[idx]})")
+                    log.info(f"{cone_color}, {CLASSES[idx]}")
                             
     

@@ -43,8 +43,9 @@ def send_log_to_server():
     login = 'venku@uchicago.edu'
     password = 'Bne3SqJG'
     split_id = 19
-    filename = 'gpg.log'
-    connection(HOST, PORT, login, password, split_id, filename)
+    filename = 'gopigo.log'
+    c = connection(HOST, PORT, login, password, split_id, filename)
+    print(f"Logs Sent to the server: {c}")
 
 
 if __name__ == '__main__':
@@ -52,9 +53,14 @@ if __name__ == '__main__':
     mic_logger.info('Start')
 
     try:
-        with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
-            print(test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
-                drive_inches=8).circle_the_cone().there_is_nothing_like_home())
+        #with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
+        # test = robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple")
+        # test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
+        #        drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+        with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="green") as test:
+            test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
+                drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+            #test.center_the_cone()
             # print(test.circle_the_cone())
             # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
             # print(test.there_is_nothing_like_home())
