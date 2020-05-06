@@ -88,6 +88,13 @@ class NavigateRajani:
         # print("Find code class called: ", total_cones)
         return flag, frame_back, total_cones, boxes, cones_data
 
+    def check_util_cone_data_is_returned_from_view_feed(self):
+        while True:
+            frame = self.camera.read()
+            flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+            if total_cones > 0:
+                return flag, frame_back, total_cones, boxes, cones_data
+
     def center_the_cone(self, height_range=(280, 360), precise=False):
         frame = self.camera.read()
         center_of_screen_coord, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, horiztl_line_upper_left_coord, \
@@ -107,7 +114,7 @@ class NavigateRajani:
                 if precise:
                     time.sleep(1)
                     frame = self.camera.read()
-                    flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
+                    flag, frame_back, total_cones, boxes, cones_data = self.check_util_cone_data_is_returned_from_view_feed()
                     cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
                     center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
@@ -117,7 +124,7 @@ class NavigateRajani:
                         left_top_bound_line_coord[0] - 50, rigth_top_bound_line_coord[0] + 50)
                     steer = 3
                     self.gopi_easy.set_eye_color((0, 255, 127))
-                # print(f"Center Boundary", center_boundary_left_right_width)
+                print(f"************Center Boundary", center_boundary_left_right_width)
 
                 if not center_boundary_left_right_width[0] <= cone_bounding_box[0] <= center_boundary_left_right_width[
                     1]:
@@ -132,6 +139,8 @@ class NavigateRajani:
                         self.gopi_easy.stop()
                         self.gopi_easy.close_left_eye()
                         time.sleep(1)
+                    print(
+                        f"Centring Cone - < condition : {cone_bounding_box[0] < height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
                     if cone_bounding_box[0] < height_range[1]:
                         # move left
                         print(F"Moving left")
@@ -175,7 +184,7 @@ class NavigateRajani:
                 # Screen bottom box line. top(upper) bottom(lower) left coordinates of Y
 
                 bottom_boundary_upper_lower_height = (
-                    horiztl_line_upper_left_coord[1] - 60, horiztl_line_lower_left_coord[1] + 40)
+                    horiztl_line_upper_left_coord[1] - 10, horiztl_line_lower_left_coord[1] + 40)
 
                 print(f"*********Boundaries calculated {bottom_boundary_upper_lower_height}")
                 # if the cone bounding box bottom line center is not with in the boundary
@@ -326,7 +335,7 @@ class NavigateRajani:
                                 horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
                 temperature = processor_temperature()
-                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (90, 120, 160), 2,
+                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (90, 120, 160), 1,
                             cv2.LINE_AA)
 
 
