@@ -14,11 +14,13 @@ class StreamThreaded:
         self.stream = self.camera.capture_continuous(self.rawCapture, format='bgr', use_video_port=True)
         self.frame = None
         self.stopped = False
+        self.t = None
         time.sleep(2)
 
     def start(self):
         print("Starting thread")
-        Thread(target=self.update, args=()).start()
+        self.t = Thread(target=self.update, args=())
+        self.t.start()
         return self
 
     def update(self):
@@ -32,6 +34,7 @@ class StreamThreaded:
                 self.stream.close()
                 self.rawCapture.close()
                 self.camera.close()
+                print("Video Cleanup")
                 return
 
     def read(self):
@@ -39,6 +42,11 @@ class StreamThreaded:
 
     def stop(self):
         self.stopped = True
+        print("Stopping the camera")
+
+    def stop_thread(self):
+        self.t.join()
+        print("Camera Thread joined")
 
 
 class StreamMultiProcssing:
