@@ -109,7 +109,7 @@ class NavigateRajani:
                     flag, frame_back, total_cones, boxes, cones_data = self.get_cone_coordinates(frame)
                     cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
-                    center_boundary_left_right_width = (left_top_bound_line_coord[0] - 50, rigth_top_bound_line_coord[0] - 50)
+                    center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
                     self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
                     center_boundary_left_right_width = (
@@ -302,7 +302,9 @@ class NavigateRajani:
                     cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)
                     cv2.line(frame, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, [200, 90, 60], 1)
 
-                    cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}",
+                    cv2.line(frame, (horiztl_line_upper_left_coord[0], horiztl_line_upper_left_coord[1]+40), [90, 120, 160], 1)
+
+                    cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}::: {horiztl_line_upper_left_coord[1]+40}",
                                 horiztl_line_upper_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
                     cv2.putText(frame, f"Lower: {horiztl_line_lower_left_coord},{horiztl_line_lower_right_coord}",
