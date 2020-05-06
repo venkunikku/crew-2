@@ -342,6 +342,7 @@ class NavigateRajani:
 
                 cv2.imshow("Video Feed - 1", frame)
                 if self.hard_stop:
+                    print("Stop is called")
                     break
                 key = cv2.waitKey(1) & 0xFF
 
