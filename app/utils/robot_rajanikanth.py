@@ -117,7 +117,8 @@ class NavigateRajani:
                     flag, frame_back, total_cones, boxes, cones_data = self.check_util_cone_data_is_returned_from_view_feed()
                     cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
-                    center_boundary_left_right_width = (left_top_bound_line_coord[0], rigth_top_bound_line_coord[0])
+                    # Steer by 1 is making the coordinate to change by 10 to 25 at least
+                    center_boundary_left_right_width = (left_top_bound_line_coord[0]-25, rigth_top_bound_line_coord[0]+25)
                     self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
                     center_boundary_left_right_width = (
