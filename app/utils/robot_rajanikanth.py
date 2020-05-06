@@ -138,7 +138,7 @@ class NavigateRajani:
                         time.sleep(1)
                         self.gopi_easy.stop()
                         self.gopi_easy.close_left_eye()
-                        time.sleep(1)
+                        continue
                     print(
                         f"Centring Cone - < condition : {cone_bounding_box[0] < height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
                     if cone_bounding_box[0] < height_range[1]:
@@ -150,7 +150,7 @@ class NavigateRajani:
                         time.sleep(1)
                         self.gopi_easy.close_right_eye()
                         self.gopi_easy.stop()
-                        time.sleep(1)
+                        continue
                 else:
                     # getting update cone data after the robot is centered.
                     self.cone_data = cones_data
