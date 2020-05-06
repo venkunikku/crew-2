@@ -303,7 +303,7 @@ class NavigateRajani:
                     cv2.line(frame, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, [200, 90, 60], 1)
 
                     cv2.line(frame, (horiztl_line_upper_left_coord[0], horiztl_line_upper_left_coord[1]-50),
-                             (horiztl_line_upper_right_coord[0],horiztl_line_upper_right_coord-50), [90, 120, 160], 2)
+                             (horiztl_line_upper_right_coord[0],horiztl_line_upper_right_coord[1]-50), [90, 120, 160], 2)
 
                     cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}::: {horiztl_line_upper_left_coord[1]+40}",
                                 horiztl_line_upper_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
