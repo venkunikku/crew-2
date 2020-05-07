@@ -41,7 +41,7 @@ class NavigateRajani:
         self.hard_stop = False
         self.destination_cone_color = None
         self.cone_data = None
-        self.find_cone_obj = FindCones(color=self.destination_cone_color)
+        #self.find_cone_obj = FindCones(color=self.destination_cone_color)
 
         self.is_audio_inference = is_audio_inference
 
