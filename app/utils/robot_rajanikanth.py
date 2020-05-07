@@ -11,6 +11,7 @@ import logging
 from queue import Queue
 from app.utils.raspberry_utils import processor_temperature
 from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
+from app.post_results.robo_client import connection
 
 '''
 @newfield team: Venku Buragadda
@@ -397,6 +398,7 @@ class NavigateRajani:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        send_log_to_server()
         # self.log.info("Destroying all the resources")
         self.hard_stop = True
         self.camera.stop()
@@ -405,3 +407,13 @@ class NavigateRajani:
         if self.inference:
             self.img_inference.join()
         cv2.destroyAllWindows()
+
+
+def send_log_to_server():
+    HOST, PORT = 'datastream.ilykei.com', 30078
+    login = 'venku@uchicago.edu'
+    password = 'Bne3SqJG'
+    split_id = 19
+    filename = 'gopigo.log'
+    c = connection(HOST, PORT, login, password, split_id, filename)
+    print(f"Logs Sent to the server: {c}")

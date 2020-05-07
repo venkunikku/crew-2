@@ -71,6 +71,6 @@ if __name__ == '__main__':
                     move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
                 print(F"Completed circling {c} world!!")
             #input("press key to stop")
-        send_log_to_server()
+
     except:
         print(traceback.print_exc())
