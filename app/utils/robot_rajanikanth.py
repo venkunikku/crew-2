@@ -69,7 +69,7 @@ class NavigateRajani:
             print("thread-2", self.cv2_window)
             self.cv2_window.start()
             print("Starting thread-2")
-        
+
         return self
 
     def find_cone(self, cone_color=None):
