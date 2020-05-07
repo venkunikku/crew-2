@@ -41,17 +41,9 @@ class NavigateRajani:
         self.hard_stop = False
         self.destination_cone_color = None
         self.cone_data = None
-        #self.find_cone_obj = FindCones(color=self.destination_cone_color)
-
+        # self.find_cone_obj = FindCones(color=self.destination_cone_color)
+        self.find_cone_obj = None
         self.is_audio_inference = is_audio_inference
-
-        # This will open a new cv2 to show the video feed in a different thread.
-        if self.show_video:
-            self.cv2_window = Thread(target=self.show_video_feed, args=(self.show_video_limit,),
-                                     name="Video Feed Thread")
-            print("thread-2", self.cv2_window)
-            self.cv2_window.start()
-            print("Starting thread-2")
 
         self.inference = inference
         self.img_inference = None
@@ -70,6 +62,14 @@ class NavigateRajani:
         self.destination_cone_color = destination_cone_color
         self.find_cone_obj = FindCones(color=self.destination_cone_color)
 
+        # This will open a new cv2 to show the video feed in a different thread.
+        if self.show_video:
+            self.cv2_window = Thread(target=self.show_video_feed, args=(self.show_video_limit,),
+                                     name="Video Feed Thread")
+            print("thread-2", self.cv2_window)
+            self.cv2_window.start()
+            print("Starting thread-2")
+        
         return self
 
     def find_cone(self, cone_color=None):
