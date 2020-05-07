@@ -4,6 +4,7 @@ import numpy as np
 from threading import Thread
 import logging
 
+
 class InferImage:
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
@@ -70,12 +71,12 @@ class InferImage:
 def infer_image(q, conf):
     log = logging.getLogger('gpg.find_cone')
     net = cv2.dnn.readNetFromCaffe("./model_weights/mobile_net_ssd/MobileNetSSD_deploy.prototxt",
-                                           "./model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
+                                   "./model_weights/mobile_net_ssd/MobileNetSSD_deploy.caffemodel")
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
-    log.info("Inferring the image")
+    print("Inferring the image")
     while True:
         image_path, cone_color = q.get()
-        log.info("Path to image")
+        print(f"Path to image: {image_path}")
         print(f"Image we got for the image in the queue:", image_path)
         if image_path:
             print(f"yes we got an image")
@@ -84,14 +85,14 @@ def infer_image(q, conf):
                        "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
                        "sofa", "train", "tvmonitor"]
             COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
-            
+
             image = cv2.imread(image_path)
-            #print(image)
+            # print(image)
             width = 400
             (h, w) = image.shape[:2]
             r = width / float(w)
             dim = (width, int(h * r))
-            
+
             print(f"Resizing done")
             resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
             blob = cv2.dnn.blobFromImage(image, 0.007843, (300, 300), 127.5)
@@ -100,7 +101,7 @@ def infer_image(q, conf):
             print("forwarding")
             detections = net.forward()
             for idx, i in enumerate(np.arange(0, detections.shape[2])):
-                #print("Inside for loop")
+                # print("Inside for loop")
                 # extract the confidence (i.e., probability) associated with
                 # the prediction
                 confidence = detections[0, 0, i, 2]
@@ -126,5 +127,3 @@ def infer_image(q, conf):
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
                     cv2.imwrite("{}_inference.png".format(idx), image)
                     log.info(f"{cone_color}, {CLASSES[idx]}")
-                            
-    

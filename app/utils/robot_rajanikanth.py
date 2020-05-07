@@ -28,18 +28,18 @@ class NavigateRajani:
         self.log = logging.getLogger('gpg.find_cone')
 
         self.camera = StreamThreaded()
-        self.home_cone_color = home_cone_color
         self.camera.start()
 
         self.gopi_easy = EasyGoPiGo3()
         self.servo = self.gopi_easy.init_servo()
         self.servo.reset_servo()
 
+        self.home_cone_color = home_cone_color
         self.show_video = show_video
         self.cv2_window = None
         self.show_video_limit = show_video_limit
         self.hard_stop = False
-        self.destination_cone_color = destination_cone_color
+        self.destination_cone_color = None
         self.cone_data = None
         self.find_cone_obj = FindCones(color=self.destination_cone_color)
 
@@ -47,7 +47,8 @@ class NavigateRajani:
 
         # This will open a new cv2 to show the video feed in a different thread.
         if self.show_video:
-            self.cv2_window = Thread(target=self.show_video_feed, args=(self.show_video_limit, ), name="Video Feed Thread")
+            self.cv2_window = Thread(target=self.show_video_feed, args=(self.show_video_limit,),
+                                     name="Video Feed Thread")
             print("thread-2", self.cv2_window)
             self.cv2_window.start()
             print("Starting thread-2")
@@ -65,6 +66,12 @@ class NavigateRajani:
         #     self.audio_inference = Thread(target=start_audio_model, args=())
         #     self.audio_inference.start()
 
+    def create_objects(self, destination_cone_color="red"):
+        self.destination_cone_color = destination_cone_color
+        self.find_cone_obj = FindCones(color=self.destination_cone_color)
+
+        return self
+
     def find_cone(self, cone_color=None):
         turn_deg_list = [0, 20, -40, 60, -80, 100, -120, 140, -160, 180, -200, 220, -240, 260, -280, 300, -320, 340,
                          -360]
@@ -72,7 +79,7 @@ class NavigateRajani:
         while True:
             for turn_to_degree in turn_deg_list:
                 print("Checking Degree", turn_to_degree)
-                self.log.info(f"Moving to the following degree {turn_to_degree}")
+                # self.log.info(f"Moving to the following degree {turn_to_degree}")
                 self.gopi_easy.turn_degrees(turn_to_degree)
                 time.sleep(1)
                 frame = self.camera.read()
@@ -118,7 +125,8 @@ class NavigateRajani:
                     cone_bounding_box = cones_data['cone-0']['bouding_box_center']
 
                     # Steer by 1 is making the coordinate to change by 10 to 25 at least
-                    center_boundary_left_right_width = (left_top_bound_line_coord[0]-25, rigth_top_bound_line_coord[0]+25)
+                    center_boundary_left_right_width = (
+                        left_top_bound_line_coord[0] - 25, rigth_top_bound_line_coord[0] + 25)
                     self.gopi_easy.set_eye_color((255, 0, 255))
                 else:
                     center_boundary_left_right_width = (
@@ -126,7 +134,8 @@ class NavigateRajani:
                     steer = 3
                     self.gopi_easy.set_eye_color((0, 255, 127))
                 print(f"************Center Boundary", center_boundary_left_right_width)
-                print(f" cone_bounding_box[0] > height_range[1] : {cone_bounding_box[0] > height_range[1]}, {cone_bounding_box[0]},{height_range[1]}")
+                print(
+                    f" cone_bounding_box[0] > height_range[1] : {cone_bounding_box[0] > height_range[1]}, {cone_bounding_box[0]},{height_range[1]}")
                 if not center_boundary_left_right_width[0] <= cone_bounding_box[0] <= center_boundary_left_right_width[
                     1]:
                     print(
@@ -195,7 +204,8 @@ class NavigateRajani:
                        bottom_boundary_upper_lower_height[1]:
                     print(f"Checking if and  elif ")
                     if bottom_boundary_upper_lower_height[0] > cone_lower_rec_boundary_mid_point_height:
-                        print(F"boundr upp lower height is greated-dr fwd {bottom_boundary_upper_lower_height[0] } > {cone_lower_rec_boundary_mid_point_height}")
+                        print(
+                            F"boundr upp lower height is greated-dr fwd {bottom_boundary_upper_lower_height[0]} > {cone_lower_rec_boundary_mid_point_height}")
                         self.gopi_easy.drive_inches(drive_inches)
                     else:
                         print(
@@ -268,7 +278,8 @@ class NavigateRajani:
 
     def there_is_nothing_like_home(self):
         self.find_cone_obj = FindCones(color=self.home_cone_color)
-        self.find_cone().center_the_cone(precise=True).move_towards_the_cone(drive_inches=8, dist_to_object=("inches", 5))
+        self.find_cone().center_the_cone(precise=True).move_towards_the_cone(drive_inches=8,
+                                                                             dist_to_object=("inches", 5))
         # self.gopi_easy.drive_inches(10)
         self.gopi_easy.turn_degrees(180)
         return self
@@ -326,19 +337,20 @@ class NavigateRajani:
                     cv2.line(frame, horiztl_line_upper_left_coord, horiztl_line_upper_right_coord, [200, 90, 60], 1)
                     cv2.line(frame, horiztl_line_lower_left_coord, horiztl_line_lower_right_coord, [200, 90, 60], 1)
 
-                    cv2.line(frame, (horiztl_line_upper_left_coord[0], horiztl_line_upper_left_coord[1]-60),
-                             (horiztl_line_upper_right_coord[0],horiztl_line_upper_right_coord[1]-60), [90, 120, 160], 2)
+                    cv2.line(frame, (horiztl_line_upper_left_coord[0], horiztl_line_upper_left_coord[1] - 60),
+                             (horiztl_line_upper_right_coord[0], horiztl_line_upper_right_coord[1] - 60),
+                             [90, 120, 160], 2)
 
-                    cv2.putText(frame, f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}::: {horiztl_line_upper_left_coord[1]+40}",
+                    cv2.putText(frame,
+                                f"Upper: {horiztl_line_upper_left_coord},{horiztl_line_upper_right_coord}::: {horiztl_line_upper_left_coord[1] + 40}",
                                 horiztl_line_upper_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
                     cv2.putText(frame, f"Lower: {horiztl_line_lower_left_coord},{horiztl_line_lower_right_coord}",
                                 horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
                 temperature = processor_temperature()
-                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (90, 120, 160), 1,
+                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 0), 1,
                             cv2.LINE_AA)
-
 
                 cv2.imshow("Video Feed - 1", frame)
                 if self.hard_stop:
@@ -381,11 +393,11 @@ class NavigateRajani:
         return frame
 
     def __enter__(self):
-        self.log.info("Context open")
+        # self.log.info("Context open")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.log.info("Destroying all the resources")
+        # self.log.info("Destroying all the resources")
         self.hard_stop = True
         self.camera.stop()
         if self.show_video:

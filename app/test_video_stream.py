@@ -57,14 +57,20 @@ if __name__ == '__main__':
         # test = robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple")
         # test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
         #        drive_inches=8).circle_the_cone().there_is_nothing_like_home()
-        with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="green") as test:
-            test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
-                drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+        # with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="green") as test:
+        #     test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
+        #         drive_inches=8).circle_the_cone().there_is_nothing_like_home()
             #test.center_the_cone()
             # print(test.circle_the_cone())
             # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
             # print(test.there_is_nothing_like_home())
-            input("press key to stop")
-            send_log_to_server()
+        cones = ["green", "purple"]
+        with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
+            for c in cones:
+                nav.create_objects(destination_cone_color=c).find_cone().center_the_cone().\
+                    move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+                print(F"Completed circling {c} world!!")
+            #input("press key to stop")
+        send_log_to_server()
     except:
         print(traceback.print_exc())
