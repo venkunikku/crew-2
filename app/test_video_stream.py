@@ -88,7 +88,7 @@ if __name__ == '__main__':
                     stream.close()
                     p.terminate()
                     # cones = ["green", "purple", "red"]
-                    cones = ["green"]
+                    cones = ["green", "purple"]
                     print(f"Got Signale to explore the world!!!")
                     with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, is_audio_inference=True) as nav:
                         for c in cones:
