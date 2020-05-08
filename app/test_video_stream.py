@@ -74,4 +74,5 @@ if __name__ == '__main__':
             #input("press key to stop")
 
     except:
+        print(F"Completed circling {c} world!!")
         print(traceback.print_exc())
