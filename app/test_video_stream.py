@@ -9,6 +9,10 @@ from app.post_results.robo_client import connection
 
 import logging
 import traceback
+import pyaudio
+import numpy as np
+import numpy.fft as fft
+import time
 
 main_logger = logging.getLogger('gpg')
 main_logger.setLevel(logging.DEBUG)
@@ -51,27 +55,46 @@ def send_log_to_server():
 if __name__ == '__main__':
     mic_logger = logging.getLogger('gpg.mic')
     mic_logger.info('Start')
+    CHUNK = 4096  # number of data points to read at a time
+    RATE = 44100  # time resolution of the recording device (Hz)
+    STREAM_SECONDS = 30
 
+    p = pyaudio.PyAudio()  # start the PyAudio class
+    stream = p.open(format=pyaudio.paInt16, channels=1, rate=RATE, input=True,
+                    frames_per_buffer=CHUNK)  # uses default input device
+
+    frequencies = []
     try:
-        #with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple") as test:
-        # test = robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="purple")
-        # test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
-        #        drive_inches=8).circle_the_cone().there_is_nothing_like_home()
-        # with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, destination_cone_color="green") as test:
-        #     test.find_cone(cone_color="red").center_the_cone().move_towards_the_cone(
-        #         drive_inches=8).circle_the_cone().there_is_nothing_like_home()
-            #test.center_the_cone()
-            # print(test.circle_the_cone())
-            # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
-            # print(test.there_is_nothing_like_home())
-        # cones = ["green", "purple", "red"]
-        cones = ["green", "purple"]
-        with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
-            for c in cones:
-                nav.create_objects(destination_cone_color=c).find_cone().center_the_cone().\
-                    move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
-                print(F"Completed circling {c} world!!")
-            #input("press key to stop")
+        while True:
+            # create a numpy array holding a single read of audio data
+            for i in range(0, int(RATE / CHUNK * STREAM_SECONDS)):  # to it a few times just to see
+                data = np.fromstring(stream.read(CHUNK), dtype=np.int16)
+                spectrum = fft.fft(data)
+                freqs = fft.fftfreq(len(spectrum))
+                l = len(data)
+
+                # imax = index of first peak in spectrum
+                imax = np.argmax(np.abs(spectrum))
+                fs = freqs[imax]
+
+                freq = (imax * fs / l) * 1000000
+                # frequencies.append(freq)
+                print(freq)
+                if freq > 1500:
+
+                    # import record_noise.py
+                    #
+                    # stream.stop_stream()
+                    # stream.close()
+                    # p.terminate()
+                    # cones = ["green", "purple", "red"]
+                    cones = ["green", "purple"]
+                    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
+                        for c in cones:
+                            nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
+                                move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+                            print(F"Completed circling {c} world!!")
+                        # input("press key to stop")
 
     except:
         print(F"Completed circling {c} world!!")
