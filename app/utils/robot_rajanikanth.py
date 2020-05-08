@@ -60,9 +60,9 @@ class NavigateRajani:
             self.img_inference.start()
 
         self.audio_inference = None
-        if self.is_audio_inference:
-            self.audio_inference = Thread(target=start_audio_model, args=())
-            self.audio_inference.start()
+        # if self.is_audio_inference:
+        #     self.audio_inference = Thread(target=start_audio_model, args=())
+        #     self.audio_inference.start()
 
     def create_objects(self, destination_cone_color="red"):
         self.destination_cone_color = destination_cone_color
@@ -243,7 +243,7 @@ class NavigateRajani:
             print(f"Adjusting to negative distance: {((distance_to_cone + dist_sensor_error) - required_dist_to_cone)}")
             self.gopi_easy.drive_inches(-((distance_to_cone + dist_sensor_error) - required_dist_to_cone))
 
-    def circle_the_cone(self, carpet=False, degrees=40, drive_inches_back_by=6):
+    def circle_the_cone(self, carpet=False, degrees=50, drive_inches_back_by=6):
 
         self.gopi_easy.turn_degrees(-90)
         if carpet:
@@ -284,7 +284,7 @@ class NavigateRajani:
 
     def there_is_nothing_like_home(self):
         self.find_cone_obj = FindCones(color=self.home_cone_color)
-        self.find_cone().center_the_cone(precise=True).move_towards_the_cone(drive_inches=8,
+        self.find_cone().center_the_cone(precise=False).move_towards_the_cone(drive_inches=8,
                                                                              dist_to_object=("inches", 5))
         # self.gopi_easy.drive_inches(10)
         self.gopi_easy.turn_degrees(180)
