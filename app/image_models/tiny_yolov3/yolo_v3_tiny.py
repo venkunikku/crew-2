@@ -213,11 +213,11 @@ def main_run_model(q, conf):
         print(f"Path to image: {image_path}")
         print(f"Image we got for the image in the queue:", image_path)
 
-        ir = "frozen_darknet_yolov3_model.xml"
+        ir = "image_models/tiny_yolov3/frozen_darknet_yolov3_model.xml"
         detection_threshold = 0.5
         import os
         print(os.system('ls'))
-        labels = "coco.names"
+        labels = "image_models/tiny_yolov3/coco.names"
         image = cv2.imread(image_path)
         # Prepare Categories
         with open(labels) as labels_file:
@@ -230,7 +230,7 @@ def main_run_model(q, conf):
         ####################### 1. Create ie core and network #######################
         # Select the myriad plugin and IRs to be used
         ie = IECore()
-        net = IENetwork(model=ir, weights=ir[:-3] + 'bin')
+        net = IENetwork(model=ir, weights="image_models/tiny_yolov3/"+ir[:-3] + 'bin')
 
         # Set up the input blobs
         input_blob = next(iter(net.inputs))
