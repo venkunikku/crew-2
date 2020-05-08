@@ -84,9 +84,9 @@ if __name__ == '__main__':
 
                     # import record_noise.py
                     #
-                    # stream.stop_stream()
-                    # stream.close()
-                    # p.terminate()
+                    stream.stop_stream()
+                    stream.close()
+                    p.terminate()
                     # cones = ["green", "purple", "red"]
                     cones = ["green"]
                     with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
