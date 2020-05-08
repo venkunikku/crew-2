@@ -39,7 +39,7 @@ def start_audio_model():
     import os
     print(os.system('pwd'))
     # load in models
-    production_models = joblib.load("audio_models/production_HMM_models.pkl")
+    production_models = joblib.load("audio_models/hmm_models/production_HMM_models.pkl")
     # sort alphabetically per label encoder
     production_models.sort(key=lambda x: x[1])
     ### STREAMING ###
