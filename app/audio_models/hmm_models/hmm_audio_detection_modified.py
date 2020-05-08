@@ -36,7 +36,7 @@ def start_audio_model():
     lb.fit_transform(['air_conditioner', 'car_horn', 'children_playing', 'dog_bark',
                       'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music'])
     # load in models
-    production_models = joblib.load("production_HMM_models.pkl")
+    production_models = joblib.load("audito_models/production_HMM_models.pkl")
     # sort alphabetically per label encoder
     production_models.sort(key=lambda x: x[1])
     ### STREAMING ###
