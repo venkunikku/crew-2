@@ -88,7 +88,7 @@ if __name__ == '__main__':
                     # stream.close()
                     # p.terminate()
                     # cones = ["green", "purple", "red"]
-                    cones = ["green", "purple"]
+                    cones = ["green"]
                     with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
                         for c in cones:
                             nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
