@@ -35,6 +35,9 @@ def start_audio_model():
     lb = LabelEncoder()
     lb.fit_transform(['air_conditioner', 'car_horn', 'children_playing', 'dog_bark',
                       'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music'])
+
+    import os
+    print(os.system('pwd'))
     # load in models
     production_models = joblib.load("audio_models/production_HMM_models.pkl")
     # sort alphabetically per label encoder
