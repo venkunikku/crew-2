@@ -138,13 +138,13 @@ class NavigateRajani:
                         left_top_bound_line_coord[0] - 50, rigth_top_bound_line_coord[0] + 50)
                     steer = 3
                     self.gopi_easy.set_eye_color((0, 255, 127))
-                print(f"************Center Boundary", center_boundary_left_right_width)
-                print(
-                    f" cone_bounding_box[0] > height_range[1] : {cone_bounding_box[0] > height_range[1]}, {cone_bounding_box[0]},{height_range[1]}")
+                #print(f"************Center Boundary", center_boundary_left_right_width)
+                #print(
+                #    f" cone_bounding_box[0] > height_range[1] : {cone_bounding_box[0] > height_range[1]}, {cone_bounding_box[0]},{height_range[1]}")
                 if not center_boundary_left_right_width[0] <= cone_bounding_box[0] <= center_boundary_left_right_width[
                     1]:
-                    print(
-                        f"Centring Cone: {cone_bounding_box[0] > height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
+                    # print(
+                    #     f"Centring Cone: {cone_bounding_box[0] > height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
                     if cone_bounding_box[0] > height_range[1]:
                         # move right
                         print(F"Moving right")
@@ -154,8 +154,8 @@ class NavigateRajani:
                         self.gopi_easy.stop()
                         self.gopi_easy.close_left_eye()
                         continue
-                    print(
-                        f"Centring Cone - < condition : {cone_bounding_box[0] < height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
+                    # print(
+                    #     f"Centring Cone - < condition : {cone_bounding_box[0] < height_range[1]} and the values {cone_bounding_box[0]} and {height_range[1]}")
                     if cone_bounding_box[0] < height_range[1]:
                         # move left
                         print(F"Moving left")
@@ -201,20 +201,20 @@ class NavigateRajani:
                 bottom_boundary_upper_lower_height = (
                     horiztl_line_upper_left_coord[1] - 10, horiztl_line_lower_left_coord[1] + 40)
 
-                print(f"*********Boundaries calculated {bottom_boundary_upper_lower_height}")
+                # print(f"*********Boundaries calculated {bottom_boundary_upper_lower_height}")
                 # if the cone bounding box bottom line center is not with in the boundary
                 print(
                     f"Top level if and else check {bottom_boundary_upper_lower_height[0]} <= {cone_lower_rec_boundary_mid_point_height}, <= {bottom_boundary_upper_lower_height[1]}  condition: {bottom_boundary_upper_lower_height[0] <= cone_lower_rec_boundary_mid_point_height <= bottom_boundary_upper_lower_height[1]}")
                 if not bottom_boundary_upper_lower_height[0] <= cone_lower_rec_boundary_mid_point_height <= \
                        bottom_boundary_upper_lower_height[1]:
-                    print(f"Checking if and  elif ")
+                    # print(f"Checking if and  elif ")
                     if bottom_boundary_upper_lower_height[0] > cone_lower_rec_boundary_mid_point_height:
-                        print(
-                            F"boundr upp lower height is greated-dr fwd {bottom_boundary_upper_lower_height[0]} > {cone_lower_rec_boundary_mid_point_height}")
+                        # print(
+                        #     F"boundr upp lower height is greated-dr fwd {bottom_boundary_upper_lower_height[0]} > {cone_lower_rec_boundary_mid_point_height}")
                         self.gopi_easy.drive_inches(drive_inches)
                     else:
-                        print(
-                            F"boundr upp lower height is lower-dr back: {bottom_boundary_upper_lower_height[0]} < {cone_lower_rec_boundary_mid_point_height}")
+                        # print(
+                        #     F"boundr upp lower height is lower-dr back: {bottom_boundary_upper_lower_height[0]} < {cone_lower_rec_boundary_mid_point_height}")
                         self.gopi_easy.drive_inches(-drive_inches)
                 elif horiztl_line_lower_left_coord[1] <= cone_lower_rec_boundary_mid_point_height:
                     # self.gopi_easy.drive_inches(-1)
