@@ -1,11 +1,7 @@
-import numpy as np
-import os
-
 from python_speech_features import mfcc
 
-from app.audio_models.hmm_models.model_utils import HMM_Model
 
-def hmm_inference(production_models, input_sample): 
+def hmm_inference(production_models, input_sample):
     
     scores = []
     

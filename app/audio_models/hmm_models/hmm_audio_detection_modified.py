@@ -7,16 +7,12 @@ import time
 start_time = time.time()
 
 import numpy as np
-import os
 
 import pyaudio
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.externals import joblib
 
-import scipy.io.wavfile as wavfile
-
-import app.audio_models.hmm_models.hmm_inference
 import logging
 
 
