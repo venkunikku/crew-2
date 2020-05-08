@@ -22,7 +22,7 @@ import argparse
 import logging
 
 # Adjust these thresholds
-DETECTION_THRESHOLD = 0.60
+DETECTION_THRESHOLD = 0.50
 IOU_THRESHOLD = 0.25
 
 # Tiny yolo anchor box values
