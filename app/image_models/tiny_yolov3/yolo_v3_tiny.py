@@ -208,40 +208,41 @@ def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_wi
 # all the work.
 def main_run_model(q, conf):
     log = logging.getLogger('gpg.find_cone')
+
+    ir = "image_models/tiny_yolov3/frozen_darknet_yolov3_model.xml"
+    detection_threshold = 0.5
+    import os
+    print(os.system('ls'))
+    labels = "image_models/tiny_yolov3/coco.names"
+
+    ####################### 1. Create ie core and network #######################
+    # Select the myriad plugin and IRs to be used
+    ie = IECore()
+    net = IENetwork(model=ir, weights=ir[:-3] + 'bin')
+
+    # Set up the input blobs
+    input_blob = next(iter(net.inputs))
+    input_shape = net.inputs[input_blob].shape
+
+    # Display model information
+    # display_info(input_shape, net.outputs, input_stream, ir, labels)
+
+    # Load the network and get the network input shape information
+    exec_net = ie.load_network(network=net, device_name=DEVICE)
+    n, c, network_input_h, network_input_w = input_shape
+    # Prepare Categories
+    with open(labels) as labels_file:
+        label_list = labels_file.read().splitlines()
+
     while True:
         image_path, cone_color = q.get()
         print(f"Path to image: {image_path}")
         print(f"Image we got for the image in the queue:", image_path)
 
-        ir = "image_models/tiny_yolov3/frozen_darknet_yolov3_model.xml"
-        detection_threshold = 0.5
-        import os
-        print(os.system('ls'))
-        labels = "image_models/tiny_yolov3/coco.names"
         image = cv2.imread(image_path)
-        # Prepare Categories
-        with open(labels) as labels_file:
-            label_list = labels_file.read().splitlines()
-
         # print(YELLOW + 'Running OpenVINO NCS Tensorflow TinyYolo v3 example...' + NOCOLOR)
         # print('\n Displaying image with objects detected in GUI...')
         # print(' Click in the GUI window and hit any key to exit.')
-
-        ####################### 1. Create ie core and network #######################
-        # Select the myriad plugin and IRs to be used
-        ie = IECore()
-        net = IENetwork(model=ir, weights=ir[:-3] + 'bin')
-
-        # Set up the input blobs
-        input_blob = next(iter(net.inputs))
-        input_shape = net.inputs[input_blob].shape
-
-        # Display model information
-        # display_info(input_shape, net.outputs, input_stream, ir, labels)
-
-        # Load the network and get the network input shape information
-        exec_net = ie.load_network(network=net, device_name=DEVICE)
-        n, c, network_input_h, network_input_w = input_shape
 
         # Read a frame
         frame = image
