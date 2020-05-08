@@ -1,0 +1,17 @@
+  269  python3 raspi_face_example.py 
+  270  python3 yolo_v3_tiny.py 
+  271  python3 yolo_v3_tiny.py --help
+  272  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model.xml --labels coco.names --input cam
+  273  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model.xml --labels coco.names --input cam --threshold 0.3
+  274  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model.xml --labels coco.names --input cam
+  275  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input cam
+  276  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model.xml --labels coco.names --input cam
+  277  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input cam
+  278  python3 yolo_v3_tiny.py --help
+  279  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input people.jpeg
+  280  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input people1.jpeg
+  281  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input /home/pi/movidius/sample/people1.jpeg
+  282  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input /home/pi/movidius/sample/people.jpeg
+  283  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input /home/pi/movidius/sample/people_2.jpeg
+  284  python3 yolo_v3_tiny.py --ir frozen_darknet_yolov3_model_tiny.xml --labels coco.names --input cam
+  285  cd /opt/vc/bin/
