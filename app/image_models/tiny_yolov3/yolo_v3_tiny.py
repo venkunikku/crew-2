@@ -215,6 +215,8 @@ def main_run_model(q, conf):
 
         ir = "frozen_darknet_yolov3_model.xml"
         detection_threshold = 0.5
+        import os
+        print(os.system('ls'))
         labels = "coco.names"
         image = cv2.imread(image_path)
         # Prepare Categories
