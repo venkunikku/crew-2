@@ -230,7 +230,7 @@ def main_run_model(q, conf):
         ####################### 1. Create ie core and network #######################
         # Select the myriad plugin and IRs to be used
         ie = IECore()
-        net = IENetwork(model=ir, weights=+ir[:-3] + 'bin')
+        net = IENetwork(model=ir, weights=ir[:-3] + 'bin')
 
         # Set up the input blobs
         input_blob = next(iter(net.inputs))
