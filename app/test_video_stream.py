@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
                 freq = (imax * fs / l) * 1000000
                 # frequencies.append(freq)
-                print(freq)
+                # print(freq)
                 if freq > 1500:
 
                     # import record_noise.py
@@ -89,13 +89,14 @@ if __name__ == '__main__':
                     p.terminate()
                     # cones = ["green", "purple", "red"]
                     cones = ["green"]
-                    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
+                    print(f"Got Signale to explore the world!!!")
+                    with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, is_audio_inference=True) as nav:
                         for c in cones:
                             nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
                                 move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
                             print(F"Completed circling {c} world!!")
                         # input("press key to stop")
-
+                    break
     except:
         print(F"Completed circling {c} world!!")
         print(traceback.print_exc())
