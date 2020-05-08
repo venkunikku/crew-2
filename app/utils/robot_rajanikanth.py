@@ -354,9 +354,9 @@ class NavigateRajani:
                     cv2.putText(frame, f"Lower: {horiztl_line_lower_left_coord},{horiztl_line_lower_right_coord}",
                                 horiztl_line_lower_left_coord, cv2.FONT_HERSHEY_SIMPLEX, .5,
                                 (0, 255, 255), 1, cv2.LINE_AA)
-                temperature = processor_temperature()
-                cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 0), 1,
-                            cv2.LINE_AA)
+                # temperature = processor_temperature()
+                # cv2.putText(frame, f"Temp:{temperature}", (50, 30), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 0), 1,
+                #             cv2.LINE_AA)
 
                 cv2.imshow("Video Feed - 1", frame)
                 if self.hard_stop:
