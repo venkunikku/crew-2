@@ -44,7 +44,7 @@ def start_audio_model():
     stream = p.open(format=pyaudio.paFloat32, channels=1, rate=sampling_rate,
                     input=True, frames_per_buffer=chunk_size)
     while (True):
-
+        print(".", end=" ")
         read_time = time.time()
         # read chunk and load it into numpy array
         data = stream.read(chunk_size)
