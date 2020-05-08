@@ -13,6 +13,7 @@ from app.utils.raspberry_utils import processor_temperature
 from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
 from app.post_results.robo_client import connection
 from app.image_models.tiny_yolov3.yolo_v3_tiny import main_run_model
+import sys
 '''
 @newfield team: Venku Buragadda
 '''
@@ -242,7 +243,7 @@ class NavigateRajani:
             print(f"Adjusting to negative distance: {((distance_to_cone + dist_sensor_error) - required_dist_to_cone)}")
             self.gopi_easy.drive_inches(-((distance_to_cone + dist_sensor_error) - required_dist_to_cone))
 
-    def circle_the_cone(self, carpet=False, degrees=40):
+    def circle_the_cone(self, carpet=False, degrees=40, drive_inches_back_by=6):
 
         self.gopi_easy.turn_degrees(-90)
         if carpet:
@@ -259,13 +260,13 @@ class NavigateRajani:
             # second semi circle
             self.gopi_easy.orbit(80, degrees)
             self.gopi_easy.turn_degrees(90)
-            self.gopi_easy.drive_inches(-6)
+            self.gopi_easy.drive_inches(-drive_inches_back_by)
             self.servo.reset_servo()
             time.sleep(2)
             self.camera.camera.capture('foo2.jpg')
             time.sleep(1)
             self.infer_image('foo2.jpg')
-            self.gopi_easy.drive_inches(6)
+            self.gopi_easy.drive_inches(drive_inches_back_by)
             self.gopi_easy.turn_degrees(-90)
             self.servo.rotate_servo(10)
 
@@ -411,6 +412,8 @@ class NavigateRajani:
         if self.inference:
             self.img_inference.join()
         cv2.destroyAllWindows()
+        sys.exit()
+
 
 
 def send_log_to_server():
