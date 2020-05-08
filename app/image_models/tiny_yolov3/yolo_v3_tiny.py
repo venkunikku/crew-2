@@ -209,7 +209,7 @@ def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_wi
 def main_run_model(q, conf):
     log = logging.getLogger('gpg.find_cone')
 
-    ir = "image_models/tiny_yolov3/frozen_darknet_yolov3_model.xml"
+    ir = "image_models/tiny_yolov3/frozen_darknet_yolov3_model_tiny.xml"
     detection_threshold = 0.5
     import os
     print(os.system('ls'))
