@@ -12,7 +12,7 @@ from queue import Queue
 from app.utils.raspberry_utils import processor_temperature
 from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio_model
 from app.post_results.robo_client import connection
-
+from app.image_models.tiny_yolov3.yolo_v3_tiny import main_run_model
 '''
 @newfield team: Venku Buragadda
 '''
@@ -49,9 +49,13 @@ class NavigateRajani:
         self.inference = inference
         self.img_inference = None
         self.q = None
+        # if self.inference:
+        #     self.q = Queue()
+        #     self.img_inference = Thread(target=infer_image, args=(self.q, 0.5))
+        #     self.img_inference.start()
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5))
+            self.img_inference = Thread(target=main_run_model, args=(self.q, 0.5))
             self.img_inference.start()
 
         self.audio_inference = None

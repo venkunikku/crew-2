@@ -64,7 +64,8 @@ if __name__ == '__main__':
             # print(test.circle_the_cone())
             # print(test.infer_image(image_path='/home/pi/Desktop/botte.jpg'))
             # print(test.there_is_nothing_like_home())
-        cones = ["green", "purple", "red"]
+        # cones = ["green", "purple", "red"]
+        cones = ["green"]
         with robot_rajanikanth.NavigateRajani(show_video=True, inference=True) as nav:
             for c in cones:
                 nav.create_objects(destination_cone_color=c).find_cone().center_the_cone().\
