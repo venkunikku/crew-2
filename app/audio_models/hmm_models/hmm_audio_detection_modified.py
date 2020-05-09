@@ -15,7 +15,7 @@ from sklearn.externals import joblib
 
 import logging
 
-
+from app.audio_models.hmm_models import hmm_inference
 def start_audio_model():
     mic_logger = logging.getLogger('gpg.mic')
     mic_logger.info('Start')

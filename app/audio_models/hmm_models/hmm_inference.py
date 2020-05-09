@@ -1,5 +1,5 @@
 from python_speech_features import mfcc
-
+from app.audio_models.hmm_models import model_utils
 
 def hmm_inference(production_models, input_sample):
     
