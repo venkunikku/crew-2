@@ -56,7 +56,8 @@ class NavigateRajani:
         #     self.img_inference.start()
         if self.inference:
             self.q = Queue()
-            self.img_inference = Thread(target=infer_image, args=(self.q, 0.5))
+            #self.img_inference = Thread(target=infer_image, args=(self.q, 0.5))
+            self.img_inference = Thread(target=main_run_model, args=(self.q, "frozen_darknet_yolov3_model_tiny.xml", None))
             self.img_inference.start()
 
         self.audio_inference = None
@@ -405,12 +406,16 @@ class NavigateRajani:
     def __exit__(self, exc_type, exc_val, exc_tb):
         send_log_to_server()
         # self.log.info("Destroying all the resources")
+        mic_logger = logging.getLogger('gpg.mic')
+        mic_logger.info("Finish")
         self.hard_stop = True
         self.camera.stop()
         if self.show_video:
             self.cv2_window.join()
         if self.inference:
             self.img_inference.join()
+        if self.is_audio_inference:
+            self.audio_inference.join()
         cv2.destroyAllWindows()
         sys.exit()
 

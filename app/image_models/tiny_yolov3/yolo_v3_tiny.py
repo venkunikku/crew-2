@@ -22,7 +22,7 @@ import argparse
 import logging
 
 # Adjust these thresholds
-DETECTION_THRESHOLD = 0.50
+DETECTION_THRESHOLD = 0.40
 IOU_THRESHOLD = 0.25
 
 # Tiny yolo anchor box values
@@ -206,10 +206,10 @@ def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_wi
 
 # This function is called from the entry point to do
 # all the work.
-def main_run_model(q, conf):
+def main_run_model(q, model, conf):
     log = logging.getLogger('gpg.find_cone')
 
-    ir = "image_models/tiny_yolov3/frozen_darknet_yolov3_model_tiny.xml"
+    ir = f"image_models/tiny_yolov3/{model}"
     detection_threshold = 0.5
     import os
     print(os.system('ls'))

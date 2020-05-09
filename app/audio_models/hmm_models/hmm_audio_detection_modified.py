@@ -77,7 +77,7 @@ def start_audio_model():
 
         print(mean_signal_power)
 
-        if mean_signal_power > -50:
+        if mean_signal_power > -20:
 
             # make prediction based on current_window
             prediction_index = hmm_inference.hmm_inference(production_models, current_window)
