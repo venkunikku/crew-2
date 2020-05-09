@@ -57,7 +57,7 @@ class NavigateRajani:
         if self.inference:
             self.q = Queue()
             #self.img_inference = Thread(target=infer_image, args=(self.q, 0.5))
-            self.img_inference = Thread(target=main_run_model, args=(self.q, "frozen_darknet_yolov3_model_tiny.xml", None))
+            self.img_inference = Thread(target=main_run_model, args=(self.q, "frozen_darknet_yolov3_model.xml", None))
             self.img_inference.start()
 
         self.audio_inference = None
