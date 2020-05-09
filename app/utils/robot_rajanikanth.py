@@ -60,9 +60,9 @@ class NavigateRajani:
             self.img_inference.start()
 
         self.audio_inference = None
-        # if self.is_audio_inference:
-        #     self.audio_inference = Thread(target=start_audio_model, args=())
-        #     self.audio_inference.start()
+        if self.is_audio_inference:
+            self.audio_inference = Thread(target=start_audio_model, args=())
+            self.audio_inference.start()
 
     def create_objects(self, destination_cone_color="red"):
         self.destination_cone_color = destination_cone_color
