@@ -88,13 +88,23 @@ if __name__ == '__main__':
                     stream.close()
                     p.terminate()
                     # cones = ["green", "purple", "red"]
-                    cones = ["green", "purple"]
+                    cones = ["green", "purple", "yellow"]
                     print(f"Got Signal to explore the world!!!")
                     with robot_rajanikanth.NavigateRajani(show_video=True, inference=True, is_audio_inference=True) as nav:
-                        for c in cones:
-                            nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
+                        # for c in cones:
+                        #     nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
+                        #         move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+                        c = cones[0]
+                        nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
                                 move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
-                            print(F"Completed circling {c} world!!")
+                        c = cones[1]
+                        nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
+                            move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+                        c = cones[2]
+                        nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
+                            move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+
+                        print(F"Completed circling {c} world!!")
                         # input("press key to stop")
                     break
     except:

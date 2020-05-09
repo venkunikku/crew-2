@@ -25,7 +25,7 @@ class NavigateRajani:
     @author: Venku Buragadda
     '''
 
-    def __init__(self, home_cone_color="yellow", destination_cone_color="red",
+    def __init__(self, home_cone_color="red", destination_cone_color="red",
                  show_video=False, show_video_limit=False, inference=False, is_audio_inference=False):
         self.log = logging.getLogger('gpg.find_cone')
 
