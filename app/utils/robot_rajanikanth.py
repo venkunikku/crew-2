@@ -411,12 +411,14 @@ class NavigateRajani:
         self.hard_stop = True
         self.camera.stop()
         if self.show_video:
+            cv2.destroyAllWindows()
             self.cv2_window.join()
+
         if self.inference:
             self.img_inference.join()
         if self.is_audio_inference:
             self.audio_inference.join()
-        cv2.destroyAllWindows()
+
         sys.exit()
 
 
