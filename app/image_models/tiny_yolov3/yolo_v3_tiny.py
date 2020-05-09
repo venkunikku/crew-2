@@ -307,7 +307,7 @@ def main_run_model(q, model, conf):
                 # TEXT_FONT, 0.5, TEXT_COLOR, 1)
                 # Set up the bounding box
                 # cv2.rectangle(display_image, (xmin, ymin), (xmax, ymax), BOX_COLOR, 1)
-                log.info(f"{cone_color, label_list[class_id]}")
+                log.info('%s,%s' % (cone_color, label_list[class_id]))
 
         # Now we can display the results!
         # cv2.imshow("OpenVINO Tiny yolo v3 - Press any key to quit", display_image)
