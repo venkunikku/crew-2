@@ -1,6 +1,10 @@
 from python_speech_features import mfcc
 from app.audio_models.hmm_models import model_utils
-
+import sys
+import os
+this_dir = os.path.dirname(__file__)
+code_dir = os.path.abspath(os.path.join(this_dir, '..', 'hmm_models'))
+sys.path.append("code_dir")
 def hmm_inference(production_models, input_sample):
     
     scores = []

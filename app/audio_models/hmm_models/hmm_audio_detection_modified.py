@@ -16,6 +16,11 @@ from sklearn.externals import joblib
 import logging
 
 from app.audio_models.hmm_models import hmm_inference
+import sys
+import os
+this_dir = os.path.dirname(__file__)
+code_dir = os.path.abspath(os.path.join(this_dir, '..', 'hmm_models'))
+sys.path.append("code_dir")
 def start_audio_model():
     mic_logger = logging.getLogger('gpg.mic')
     mic_logger.info('Start')
@@ -34,6 +39,7 @@ def start_audio_model():
 
     import os
     print(os.system('pwd'))
+    print(os.path)
     # load in models
     production_models = joblib.load("audio_models/hmm_models/production_HMM_models.pkl")
     # sort alphabetically per label encoder
