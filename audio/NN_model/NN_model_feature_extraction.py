@@ -37,7 +37,9 @@ def extract_feature(file_name):
     # Spectral Rolloff This measure is useful in distinguishing voiced speech from unvoiced
     rolloff = np.mean(librosa.feature.spectral_rolloff(y=X, sr=sample_rate).T,axis=0)
 
-    return mfccs, chroma, mel, contrast, tonnetz
+    ext_features = np.hstack([mfccs,chroma,mel,contrast,tonnetz, cent, rolloff])
+    test_x = np.array(ext_features)
+    return(test_x)
 
 '''
 There are two more possibel feaures, and havn't used in the current model
@@ -68,7 +70,7 @@ for filename in os.listdir(folder_name):
         mfccs, chroma, mel, contrast,tonnetz = extract_feature(file)
 
         # stack all feaures into one row
-        ext_features = np.hstack([mfccs,chroma,mel,contrast,tonnetz])
+        ext_features = extract_feature(file)
         features = np.vstack([features,ext_features])
 
         # build correcponding label

@@ -13,13 +13,32 @@ import numpy as np
         
         
 def extract_feature(audio_input):
-    X, sample_rate = librosa.load(audio_input)
+    X, sample_rate = librosa.load(file_name)
+
+    # Short-time Fourier transform
     stft = np.abs(librosa.stft(X))
-    mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0)
+
+    # Mel-frequency cepsetrum coefficient and use 40 coefficient
+    mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=12).T,axis=0)
+
+    # Chroma freatures represent 12 different pitch classes
     chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
+
+    # Mel-scaled sepectrogram
     mel = np.mean(librosa.feature.melspectrogram(X, sr=sample_rate).T,axis=0)
+
+    # spectral contrast
     contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,axis=0)
+
+    # Tonal centroid features
     tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T,axis=0)
+
+    # spectral centroid is a measure used in digital signal processing to characterise a spectrum.
+    cent = np.mean(librosa.feature.spectral_centroid(y=X, sr=sample_rate).T,axis=0)
+
+    # Spectral Rolloff This measure is useful in distinguishing voiced speech from unvoiced
+    rolloff = np.mean(librosa.feature.spectral_rolloff(y=X, sr=sample_rate).T,axis=0)
+
     # return mfccs,chroma,mel,contrast,tonnetz
     ext_features = np.hstack([mfccs,chroma,mel,contrast,tonnetz])
     test_x = np.array(ext_features)
