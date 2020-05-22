@@ -17,7 +17,7 @@ def extract_feature(file_name):
     stft = np.abs(librosa.stft(X))
 
     # Mel-frequency cepsetrum coefficient and use 40 coefficient
-    mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0)
+    mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=12).T,axis=0)
 
     # Chroma freatures represent 12 different pitch classes
     chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
@@ -30,6 +30,12 @@ def extract_feature(file_name):
 
     # Tonal centroid features
     tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T,axis=0)
+
+    # spectral centroid is a measure used in digital signal processing to characterise a spectrum.
+    cent = np.mean(librosa.feature.spectral_centroid(y=X, sr=sample_rate).T,axis=0)
+
+    # Spectral Rolloff This measure is useful in distinguishing voiced speech from unvoiced
+    rolloff = np.mean(librosa.feature.spectral_rolloff(y=X, sr=sample_rate).T,axis=0)
 
     return mfccs, chroma, mel, contrast, tonnetz
 
@@ -52,7 +58,7 @@ meta_data = pd.read_csv('../mixed/mixed_metadata.csv')
 ## read all mixed noisy audio data and extract all features described above
 audio_class = []
 folder_name = '../mixed/'
-features, labels = np.empty((0,193)), np.empty(0)
+features, labels = np.empty((0,149)), np.empty(0)
 
 for filename in os.listdir(folder_name):
     if filename != "mixed_metadata.csv":

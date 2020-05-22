@@ -68,7 +68,7 @@ test_x = sc.transform(test_x)
 ## build Keras NN model
 model=Sequential()
 
-model.add(Dense(units=400,activation='relu', input_dim =193))
+model.add(Dense(units=400,activation='relu', input_dim =149))
 model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(Dense(units=500,activation='relu'))
