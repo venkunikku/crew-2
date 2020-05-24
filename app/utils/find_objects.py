@@ -57,12 +57,13 @@ class FindCones:
 
             # converting color image to HSV. HSV helps to filter colors much better than RGB.
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
+            cv2.imshow("Orginal", img)
+            cv2.imshow("HSV images", hsv)
             if self.color == "red":
                 # filtering color based on the object it was initialized.
                 imgLowThreshold = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
                 imgHighThreshold = cv2.inRange(hsv, self.upperc_array[0], self.upperc_array[1])
-                cv2.imshow("Orginal", img)
+
 
                 # combining low and high threshold image to get only the color eg red in the picture.
                 imgThresh = cv2.bitwise_or(imgLowThreshold, imgHighThreshold)
