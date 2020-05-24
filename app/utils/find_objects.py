@@ -76,12 +76,12 @@ class FindCones:
             kernel = np.ones((5, 5))
             img_thresh_opened = cv2.morphologyEx(imgThresh, cv2.MORPH_OPEN, kernel)
 
-            cv2.imshow("img_threh_opened", img_thresh_opened)
+            cv2.imshow("Erosion & Dilation", img_thresh_opened)
 
             # blurring the image. You can see objects better when you blur the image in image processing.
             img_thresh_blurred = cv2.medianBlur(img_thresh_opened, 5)
 
-            cv2.imshow("img_Median Blur", img_thresh_blurred)
+            cv2.imshow("Median Blur", img_thresh_blurred)
 
             # here we are detecting the edge of the objects we have filtered so far using above steps.
             img_edges = cv2.Canny(img_thresh_blurred, 80, 160)
@@ -119,7 +119,7 @@ class FindCones:
             img_all_convex_hulls = np.zeros_like(img_edges)
             cv2.drawContours(img_all_convex_hulls, all_convex_hulls, -1, (255, 255, 255), 2)
 
-            cv2.imshow("img_all_convex_hulls", img_approx_contours)
+            cv2.imshow("Convex Hull", img_approx_contours)
 
             # here are filtering only objects that are having 3 to 10 points (or shape or edges). So in our case of cone
             # any object that has at least 3 points to form an approx triangle for cone.
@@ -131,7 +131,7 @@ class FindCones:
             img_convex_hulls_3to10 = np.zeros_like(img_edges)
             cv2.drawContours(img_convex_hulls_3to10, convex_hulls_3to10, -1, (255, 255, 255), 2)
 
-            cv2.imshow("img_convex_hulls_3to10", img_convex_hulls_3to10)
+            cv2.imshow("Imag with 3to10 edges pointing up", img_convex_hulls_3to10)
 
             # here are only picking triangle that are points upwards. SO if the cone is upside down, our code will not
             # detect that as the cone.
@@ -166,7 +166,7 @@ class FindCones:
                 cv2.putText(img_res, f"{self.color}-{cone_index}", (rect[0], rect[1]-4), cv2.FONT_HERSHEY_SIMPLEX, .5, self.__bgr_dic[self.color], 1, cv2.LINE_AA)
                 cv2.putText(img_res, f"coord: {c_obj['bouding_box_center']}", (centX, centY), cv2.FONT_HERSHEY_SIMPLEX, .5, (0,255, 255), 1, cv2.LINE_AA)
 
-            cv2.imshow("img_res", img_res)
+            cv2.imshow("Final", img_res)
 
             # print(f"Total Cones Found:{str(len(bounding_rects))}")
             
