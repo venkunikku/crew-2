@@ -14,6 +14,7 @@ from app.audio_models.hmm_models.hmm_audio_detection_modified import start_audio
 from app.post_results.robo_client import connection
 from app.image_models.tiny_yolov3.yolo_v3_tiny import main_run_model
 import sys
+from datetime import datetime
 '''
 @newfield team: Venku Buragadda
 '''
@@ -245,7 +246,8 @@ class NavigateRajani:
             self.gopi_easy.drive_inches(-((distance_to_cone + dist_sensor_error) - required_dist_to_cone))
 
     def circle_the_cone(self, carpet=False, degrees=50, drive_inches_back_by=6):
-
+        dt = datetime.now().strftime("%Y_%m_%d_$f")
+        image_path1 = 'foo1_{}.jpg'.format(dt)
         self.gopi_easy.turn_degrees(-90)
         if carpet:
             self.gopi_easy.orbit(480, degrees)
@@ -253,10 +255,10 @@ class NavigateRajani:
             self.gopi_easy.orbit(85, degrees)
             self.servo.reset_servo()
             self.servo.rotate_servo(10)
-            time.sleep(1)
-            self.camera.camera.capture('foo1.jpg')
-            time.sleep(2)
-            self.infer_image('foo1.jpg')
+            #time.sleep(1)
+            #self.camera.camera.capture('foo1.jpg')
+            #time.sleep(2)
+            #self.infer_image('foo1.jpg')
 
             # second semi circle
             self.gopi_easy.orbit(80, degrees)
@@ -264,16 +266,16 @@ class NavigateRajani:
             self.gopi_easy.drive_inches(-drive_inches_back_by)
             self.servo.reset_servo()
             time.sleep(2)
-            self.camera.camera.capture('foo2.jpg')
+            self.camera.camera.capture(image_path1)
             time.sleep(1)
-            self.infer_image('foo2.jpg')
+            self.infer_image(image_path1)
             self.gopi_easy.drive_inches(drive_inches_back_by)
             self.gopi_easy.turn_degrees(-90)
             self.servo.rotate_servo(10)
 
             self.gopi_easy.orbit(75, degrees)
             time.sleep(2)
-            self.camera.camera.capture('foo3.jpg')
+            #self.camera.camera.capture('foo3.jpg')
             self.gopi_easy.orbit(120, degrees)
             self.servo.reset_servo()
         self.gopi_easy.turn_degrees(90)
