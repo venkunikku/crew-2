@@ -94,9 +94,9 @@ if __name__ == '__main__':
                         # for c in cones:
                         #     nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
                         #         move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
-                        c = cones[0]
-                        nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
-                                move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
+                        # c = cones[0]
+                        # nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
+                        #         move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
                         c = cones[1]
                         nav.create_objects(destination_cone_color=c).find_cone().center_the_cone(). \
                             move_towards_the_cone(drive_inches=8).circle_the_cone().there_is_nothing_like_home()
