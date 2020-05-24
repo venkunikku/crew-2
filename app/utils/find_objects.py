@@ -62,30 +62,30 @@ class FindCones:
                 # filtering color based on the object it was initialized.
                 imgLowThreshold = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
                 imgHighThreshold = cv2.inRange(hsv, self.upperc_array[0], self.upperc_array[1])
-                # cv2.imshow("Orginal", img)
+                cv2.imshow("Orginal", img)
 
                 # combining low and high threshold image to get only the color eg red in the picture.
                 imgThresh = cv2.bitwise_or(imgLowThreshold, imgHighThreshold)
             else:
                 imgThresh = cv2.inRange(hsv, self.lowerc_array[0], self.lowerc_array[1])
 
-            # cv2.imshow("imgThresh", imgThresh)
+            cv2.imshow("imgThresh", imgThresh)
 
             # applying erosion and dilation on the image using kernel 5. Always Kernel should be a odd number
             kernel = np.ones((5, 5))
             img_thresh_opened = cv2.morphologyEx(imgThresh, cv2.MORPH_OPEN, kernel)
 
-            # cv2.imshow("img_threh_opened", img_thresh_opened)
+            cv2.imshow("img_threh_opened", img_thresh_opened)
 
             # blurring the image. You can see objects better when you blur the image in image processing.
             img_thresh_blurred = cv2.medianBlur(img_thresh_opened, 5)
 
-            # cv2.imshow("img_Median Blur", img_thresh_blurred)
+            cv2.imshow("img_Median Blur", img_thresh_blurred)
 
             # here we are detecting the edge of the objects we have filtered so far using above steps.
             img_edges = cv2.Canny(img_thresh_blurred, 80, 160)
 
-            # cv2.imshow("Canny edges (img_edges)", img_edges)
+            cv2.imshow("Canny edges (img_edges)", img_edges)
 
             # Finding contour for the image based on the canny edges.
             contours, hierarchy = cv2.findContours(np.array(img_edges), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -106,7 +106,7 @@ class FindCones:
             img_approx_contours = np.zeros_like(img_edges)
             cv2.drawContours(img_approx_contours, approx_contours, -1, (255, 255, 255), 1)
 
-            # cv2.imshow("Approx Poly DP from edges (img_approx_contours)", img_approx_contours)
+            cv2.imshow("Approx Poly DP from edges (img_approx_contours)", img_approx_contours)
 
             # convex Hull smooth's the points of the cone. Canny edges will detect the edges of the object. For example
             # for the cone case, it will detect the base too in the canny edges. Convex Hull smoothing will remove those
@@ -118,7 +118,7 @@ class FindCones:
             img_all_convex_hulls = np.zeros_like(img_edges)
             cv2.drawContours(img_all_convex_hulls, all_convex_hulls, -1, (255, 255, 255), 2)
 
-            # cv2.imshow("img_all_convex_hulls", img_approx_contours)
+            cv2.imshow("img_all_convex_hulls", img_approx_contours)
 
             # here are filtering only objects that are having 3 to 10 points (or shape or edges). So in our case of cone
             # any object that has at least 3 points to form an approx triangle for cone.
@@ -130,7 +130,7 @@ class FindCones:
             img_convex_hulls_3to10 = np.zeros_like(img_edges)
             cv2.drawContours(img_convex_hulls_3to10, convex_hulls_3to10, -1, (255, 255, 255), 2)
 
-            # cv2.imshow("img_convex_hulls_3to10", img_convex_hulls_3to10)
+            cv2.imshow("img_convex_hulls_3to10", img_convex_hulls_3to10)
 
             # here are only picking triangle that are points upwards. SO if the cone is upside down, our code will not
             # detect that as the cone.
@@ -150,7 +150,7 @@ class FindCones:
             cv2.drawContours(img_cones, cones, -1, (255, 255, 255), 2)
             # cv2.drawContours(img_cones, , -1, (1,255,1), 2)
 
-            #cv2.imshow("img_cones", img_cones)
+            cv2.imshow("img_cones", img_cones)
 
             img_res = img.copy()
             cv2.drawContours(img_res, cones, -1, (255, 255, 255), 2)
@@ -165,14 +165,14 @@ class FindCones:
                 cv2.putText(img_res, f"{self.color}-{cone_index}", (rect[0], rect[1]-4), cv2.FONT_HERSHEY_SIMPLEX, .5, self.__bgr_dic[self.color], 1, cv2.LINE_AA)
                 cv2.putText(img_res, f"coord: {c_obj['bouding_box_center']}", (centX, centY), cv2.FONT_HERSHEY_SIMPLEX, .5, (0,255, 255), 1, cv2.LINE_AA)
 
-            # cv2.imshow("img_res", img_res)
+            cv2.imshow("img_res", img_res)
 
             # print(f"Total Cones Found:{str(len(bounding_rects))}")
             
             
 
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
             total_cone = len(bounding_rects)
             if total_cone > 0:
                 return True, img_res, total_cone, bounding_rects, cones_obj
