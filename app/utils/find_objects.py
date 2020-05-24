@@ -94,7 +94,7 @@ class FindCones:
             img_contours = np.zeros_like(img_edges)
             cv2.drawContours(img_contours, contours, -1, (255, 255, 255), 2)
 
-            # cv2.imshow("Contours from edges (img_edges)", img_contours)
+            cv2.imshow("Contours from edges (img_edges)", img_contours)
 
             # We are trying to find the approximate points/shape of the object in the image.
             approx_contours = []
